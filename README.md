@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vulnexa
 
-## Getting Started
+Vulnexa is an open-source smart vulnerability assessment tool for web applications. It is designed to help identify possible security weaknesses, analyze findings, show severity levels, suggest remediation steps, and generate clear security reports.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This project is being developed as a Year 3 university major project. The goal is to create a modern and practical security-focused platform that makes vulnerability assessment easier to understand and more useful for developers, students, and small teams.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Planned Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Modern web dashboard
+- Web application vulnerability analysis
+- Severity scoring with CVSS-style risk levels
+- Clear remediation suggestions
+- Report generation
+- Clean and responsive UI
+- Future AI-assisted security insights
+- Optional local LLM support for private analysis
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+### Frontend
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js
+- Tailwind CSS
+- shadcn/ui
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Python
 
-## Deploy on Vercel
+### Planned Security/Data Sources
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- CVE
+- CWE
+- CVSS
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Status
+
+Currently in active development.
+
+At this stage, the main focus is on building the frontend interface and project structure. Backend logic and vulnerability analysis features will be added in later stages.
+
+## Goals
+
+- Build a professional security project with real-world value
+- Present vulnerability findings in a simple and useful way
+- Help users understand risks and possible fixes
+- Create a strong final-year portfolio project
+
+## License
+
+This project is licensed under the MIT License.
+
+## Author
+
+Developed by Shahenwaz Muzahid and team as part of a university final year project.
