@@ -1,19 +1,18 @@
 import { mockScanResult } from "@/lib/mock-data";
 import { SeverityBadge } from "@/components/scan/severity-badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function FindingsPreview() {
   return (
-    <div className="panel space-y-4 p-4 md:p-6">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight">Findings</h2>
-          <p className="text-sm text-muted-foreground">
-            Mock data preview for frontend development
-          </p>
-        </div>
-      </div>
+    <Card className="panel">
+      <CardHeader>
+        <CardTitle className="text-xl tracking-tight">Findings</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Mock data preview for frontend development
+        </p>
+      </CardHeader>
 
-      <div className="space-y-3">
+      <CardContent className="space-y-3">
         {mockScanResult.findings.map((finding) => (
           <div
             key={finding.id}
@@ -35,7 +34,7 @@ export function FindingsPreview() {
             </div>
           </div>
         ))}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

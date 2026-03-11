@@ -1,4 +1,5 @@
 import type { Severity } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const severityClassMap: Record<Severity, string> = {
@@ -11,13 +12,13 @@ const severityClassMap: Record<Severity, string> = {
 
 export function SeverityBadge({ severity }: { severity: Severity }) {
   return (
-    <span
+    <Badge
       className={cn(
-        "inline-flex rounded-full px-2.5 py-1 text-xs font-medium capitalize",
+        "capitalize border-transparent px-2.5 py-1 text-xs font-medium",
         severityClassMap[severity],
       )}
     >
       {severity}
-    </span>
+    </Badge>
   );
 }
