@@ -1,5 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Shield, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
 
@@ -8,9 +9,15 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <Container className="flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
-          <div className="panel-glow flex size-10 items-center justify-center rounded-2xl">
-            <Shield className="size-5 text-primary" />
-          </div>
+          <Image
+            src="/brand/vulnexa-logo.png"
+            alt="Vulnexa logo"
+            width={42}
+            height={42}
+            className="h-10 w-10 object-contain shrink-0"
+            priority
+          />
+
           <div className="flex flex-col leading-none">
             <span className="text-sm font-semibold tracking-wide text-foreground">
               Vulnexa
