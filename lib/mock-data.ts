@@ -1,4 +1,4 @@
-import type { ScanResult } from "@/lib/types";
+import type { ScanHistoryItem, ScanResult } from "@/lib/types";
 
 export const mockScanResult: ScanResult = {
   scanId: "scan_001",
@@ -75,3 +75,33 @@ export const mockScanResult: ScanResult = {
     },
   ],
 };
+
+export const mockScanHistory: ScanHistoryItem[] = [
+  {
+    scanId: "scan_001",
+    projectName: "demo-ecommerce-app",
+    scannedAt: "2026-03-11T16:30:00Z",
+    status: "completed",
+    totalFiles: 42,
+    totalFindings: 5,
+    highestSeverity: "critical",
+  },
+  {
+    scanId: "scan_002",
+    projectName: "student-portal-ui",
+    scannedAt: "2026-03-10T12:10:00Z",
+    status: "completed",
+    totalFiles: 28,
+    totalFindings: 3,
+    highestSeverity: "high",
+  },
+  {
+    scanId: "scan_003",
+    projectName: "internal-admin-dashboard",
+    scannedAt: "2026-03-09T18:45:00Z",
+    status: "queued",
+    totalFiles: 65,
+    totalFindings: 0,
+    highestSeverity: "info",
+  },
+];

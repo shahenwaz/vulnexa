@@ -20,3 +20,13 @@ export type ScanResult = {
   severityCounts: Record<Severity, number>;
   findings: ScanFinding[];
 };
+
+export type ScanHistoryItem = {
+  scanId: string;
+  projectName: string;
+  scannedAt: string;
+  status: "completed" | "queued" | "draft";
+  totalFiles: number;
+  totalFindings: number;
+  highestSeverity: Severity;
+};
