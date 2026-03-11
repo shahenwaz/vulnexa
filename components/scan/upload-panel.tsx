@@ -12,16 +12,12 @@ export function UploadPanel() {
   return (
     <Tabs defaultValue="upload" className="w-full">
       <TabsList className="mb-2">
-        <TabsTrigger value="upload" className="cursor-pointer">
-          Upload
-        </TabsTrigger>
-        <TabsTrigger value="details" className="cursor-pointer">
-          Scan details
-        </TabsTrigger>
+        <TabsTrigger value="upload">Upload</TabsTrigger>
+        <TabsTrigger value="details">Scan details</TabsTrigger>
       </TabsList>
 
       <TabsContent value="upload" className="mt-0">
-        <Card className="panel-glow">
+        <Card className="panel-glow rounded-3xl">
           <CardHeader>
             <CardTitle className="text-2xl tracking-tight">
               Upload project files
@@ -42,13 +38,13 @@ export function UploadPanel() {
                 Accepts source files and zip uploads for the future scan engine.
               </p>
 
-              <Button type="button" className="mt-5 rounded-2xl">
+              <Button type="button" className="mt-5 cursor-pointer rounded-2xl">
                 Choose files
               </Button>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <Card className="panel-muted border-border/60">
+              <Card className="panel-muted rounded-2xl border-border/60">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
                     <FolderSearch className="size-5 text-accent" />
@@ -61,7 +57,7 @@ export function UploadPanel() {
                 </CardContent>
               </Card>
 
-              <Card className="panel-muted border-border/60">
+              <Card className="panel-muted rounded-2xl border-border/60">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
                     <Shield className="size-5 text-primary" />
@@ -79,7 +75,7 @@ export function UploadPanel() {
       </TabsContent>
 
       <TabsContent value="details" className="mt-0">
-        <Card className="panel">
+        <Card className="panel rounded-3xl">
           <CardHeader>
             <CardTitle className="text-2xl tracking-tight">
               Scan configuration
@@ -88,19 +84,26 @@ export function UploadPanel() {
 
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Project name</label>
-              <Input placeholder="e.g. vulnexa-demo-app" />
+              <label htmlFor="project-name" className="text-sm font-medium">
+                Project name
+              </label>
+              <Input id="project-name" placeholder="e.g. vulnexa-demo-app" />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Notes</label>
+              <label htmlFor="scan-notes" className="text-sm font-medium">
+                Notes
+              </label>
               <Textarea
+                id="scan-notes"
                 placeholder="Add scan notes, project context, or assumptions for this review..."
                 className="min-h-32"
               />
             </div>
 
-            <Button className="rounded-2xl">Save scan details</Button>
+            <Button className="cursor-pointer rounded-2xl">
+              Save scan details
+            </Button>
           </CardContent>
         </Card>
       </TabsContent>
