@@ -11,12 +11,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export function UploadPanel() {
   return (
     <Tabs defaultValue="upload" className="w-full">
-      <TabsList className="mb-6 grid w-full max-w-md grid-cols-2">
-        <TabsTrigger value="upload">Upload</TabsTrigger>
-        <TabsTrigger value="details">Scan details</TabsTrigger>
+      <TabsList className="mb-2">
+        <TabsTrigger value="upload" className="cursor-pointer">
+          Upload
+        </TabsTrigger>
+        <TabsTrigger value="details" className="cursor-pointer">
+          Scan details
+        </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="upload">
+      <TabsContent value="upload" className="mt-0">
         <Card className="panel-glow">
           <CardHeader>
             <CardTitle className="text-2xl tracking-tight">
@@ -74,7 +78,7 @@ export function UploadPanel() {
         </Card>
       </TabsContent>
 
-      <TabsContent value="details">
+      <TabsContent value="details" className="mt-0">
         <Card className="panel">
           <CardHeader>
             <CardTitle className="text-2xl tracking-tight">
