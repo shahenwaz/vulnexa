@@ -1,15 +1,15 @@
 import { FindingsPreview } from "@/components/scan/findings-preview";
 import { ScanSummaryCard } from "@/components/scan/scan-summary-card";
 import { Container } from "@/components/shared/container";
+import { PageIntro } from "@/components/shared/page-intro";
 import { Section } from "@/components/shared/section";
-import { SectionHeading } from "@/components/shared/section-heading";
 import { mockScanResult } from "@/lib/mock-data";
 
 export default function ScanDetailsPage() {
   return (
     <Section>
       <Container className="space-y-8">
-        <SectionHeading
+        <PageIntro
           eyebrow="Scan results"
           title={mockScanResult.projectName}
           description={`Scan ID: ${mockScanResult.scanId} • Files scanned: ${mockScanResult.totalFiles}`}
