@@ -109,7 +109,7 @@ export function SiteHeader() {
       >
         <div
           className={cn(
-            "absolute inset-0 bg-background/28 backdrop-blur-md transition-all duration-300",
+            "absolute inset-0 bg-background/20 backdrop-blur-sm transition-all duration-300",
             isOpen ? "opacity-100" : "opacity-0",
           )}
           onClick={() => setOpenPathname(null)}
