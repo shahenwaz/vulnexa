@@ -15,22 +15,22 @@ export function PageIntro({
   className,
 }: PageIntroProps) {
   return (
-    <div className={cn("max-w-3xl space-y-4", className)}>
+    <div className={cn("max-w-3xl space-y-5", className)}>
       {eyebrow ? (
         <Badge
           variant="outline"
-          className="border-primary/25 bg-primary/10 text-primary"
+          className="w-fit border-primary/25 bg-primary/10 px-3 py-1 text-primary"
         >
           {eyebrow}
         </Badge>
       ) : null}
 
-      <div className="space-y-2">
-        <h1 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+      <div className="space-y-3">
+        <h1 className="text-balance text-4xl font-semibold tracking-tight md:text-5xl xl:text-6xl">
           {title}
         </h1>
         {description ? (
-          <p className="text-base leading-7 text-muted-foreground md:text-lg">
+          <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
             {description}
           </p>
         ) : null}
