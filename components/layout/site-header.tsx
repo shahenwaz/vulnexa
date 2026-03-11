@@ -30,7 +30,7 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-6 md:flex">
           <Link
-            href="/"
+            href="/dashboard"
             className="text-sm text-muted-foreground transition hover:text-foreground"
           >
             Dashboard
