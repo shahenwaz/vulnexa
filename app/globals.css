@@ -283,6 +283,57 @@
   }
 }
 
+@media print {
+  :root,
+  .dark {
+    --background: white;
+    --foreground: black;
+    --card: white;
+    --card-foreground: black;
+    --popover: white;
+    --popover-foreground: black;
+    --border: oklch(0.82 0 0);
+    --muted: oklch(0.96 0 0);
+    --muted-foreground: oklch(0.45 0 0);
+  }
+
+  html,
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  body {
+    background-image: none !important;
+  }
+
+  [data-print-hidden="true"] {
+    display: none !important;
+  }
+
+  .panel,
+  .panel-glow,
+  .panel-glow-cyan,
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
+}
+
 /* Scrollbar */
 * {
   scrollbar-width: thin;
