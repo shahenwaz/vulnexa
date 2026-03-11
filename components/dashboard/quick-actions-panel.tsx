@@ -17,9 +17,10 @@ const actions = [
     icon: ShieldCheck,
   },
   {
-    title: "Prepare reports later",
-    description: "Keep the UI ready for report export and summaries.",
-    href: "/",
+    title: "Open security report",
+    description:
+      "Review the executive summary, grouped findings, and remediation plan.",
+    href: "/reports/scan_001",
     icon: FileText,
   },
 ];
