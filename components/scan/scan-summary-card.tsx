@@ -24,10 +24,18 @@ export function ScanSummaryCard({
 }: ScanSummaryCardProps) {
   return (
     <div
-      className={cn("rounded-3xl border p-5 transition", toneClassMap[tone])}
+      className={cn(
+        "min-w-0 rounded-2xl border px-3 py-2.5 sm:px-3.5 sm:py-3",
+        toneClassMap[tone],
+      )}
     >
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="mt-3 text-3xl font-semibold tracking-tight">{value}</p>
+      <p className="truncate text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground sm:text-[11px]">
+        {label}
+      </p>
+
+      <p className="mt-1.5 text-xl font-semibold tracking-tight sm:mt-2 sm:text-2xl">
+        {value}
+      </p>
     </div>
   );
 }

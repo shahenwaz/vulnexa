@@ -34,39 +34,41 @@ export default function ScanDetailsPage() {
 
   return (
     <Section className="pt-10 md:pt-14">
-      <Container className="space-y-8">
+      <Container className="space-y-6 md:space-y-8">
         <PageIntro
           eyebrow="Scan results"
           title={mockScanResult.projectName}
           description="Review vulnerability findings, inspect evidence, and prepare remediation work through a cleaner technical scan view."
         />
 
-        <div className="panel-glow flex flex-col gap-4 rounded-3xl p-5 md:flex-row md:items-center md:justify-between md:p-6">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                Highest severity
-              </span>
-              <SeverityBadge severity={highestSeverity} />
+        <div className="panel-glow rounded-3xl p-4 md:p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0 space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Highest severity
+                </span>
+                <SeverityBadge severity={highestSeverity} />
+              </div>
+
+              <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+                {mockScanResult.totalFindings} findings detected across{" "}
+                {mockScanResult.totalFiles} files. {openFindings} finding
+                {openFindings > 1 ? "s are" : " is"} currently open and should
+                be reviewed first.
+              </p>
             </div>
 
-            <p className="text-sm leading-6 text-muted-foreground">
-              {mockScanResult.totalFindings} findings detected across{" "}
-              {mockScanResult.totalFiles} files. {openFindings} finding
-              {openFindings > 1 ? "s are" : " is"} currently open and should be
-              reviewed first.
-            </p>
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <Link href={`/reports/${mockScanResult.scanId}`}>
+                Open security report
+                <FileText className="size-4" />
+              </Link>
+            </Button>
           </div>
-
-          <Button asChild variant="outline" className="w-full md:w-auto">
-            <Link href={`/reports/${mockScanResult.scanId}`}>
-              Open security report
-              <FileText className="size-4" />
-            </Link>
-          </Button>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 md:gap-4 sm:grid-cols-3 xl:grid-cols-5">
           <ScanSummaryCard
             label="Total findings"
             value={String(mockScanResult.totalFindings)}
@@ -98,33 +100,33 @@ export default function ScanDetailsPage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_360px] xl:items-start">
-          <div className="space-y-6">
-            <div className="panel rounded-3xl border-border/70 p-5 md:p-6">
-              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                <div className="space-y-2">
-                  <h2 className="text-xl font-semibold tracking-tight">
-                    Findings overview
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Filter findings by severity and review detailed impact,
-                    evidence, and remediation context.
-                  </p>
+          <div className="min-w-0 space-y-6">
+            <div className="panel rounded-3xl border-border/70 p-4 md:p-5">
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <h2 className="text-lg font-semibold tracking-tight md:text-xl">
+                      Findings overview
+                    </h2>
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      Filter findings by severity and review detailed impact,
+                      evidence, and remediation context.
+                    </p>
+                  </div>
+
+                  <div className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border/60 bg-card/70 px-3 py-2 text-xs font-medium text-muted-foreground sm:w-fit sm:justify-start">
+                    <span>Showing</span>
+                    <span className="text-foreground">
+                      {filteredFindings.length}
+                    </span>
+                    <span>of</span>
+                    <span className="text-foreground">
+                      {mockScanResult.findings.length}
+                    </span>
+                    <span>findings</span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>Showing</span>
-                  <span className="font-medium text-foreground">
-                    {filteredFindings.length}
-                  </span>
-                  <span>of</span>
-                  <span className="font-medium text-foreground">
-                    {mockScanResult.findings.length}
-                  </span>
-                  <span>findings</span>
-                </div>
-              </div>
-
-              <div className="mt-5">
                 <FindingsFilters value={filter} onChange={setFilter} />
               </div>
             </div>
@@ -150,13 +152,13 @@ export default function ScanDetailsPage() {
             <ScanMetadataPanel result={mockScanResult} />
             <RemediationPanel result={mockScanResult} />
 
-            <div className="panel rounded-3xl border-border/70 p-5">
+            <div className="panel rounded-3xl border-border/70 p-4 md:p-5">
               <div className="flex items-start gap-3">
                 <div className="rounded-2xl border border-primary/20 bg-primary/10 p-2">
                   <ArrowRight className="size-4 text-primary" />
                 </div>
 
-                <div className="space-y-2">
+                <div className="min-w-0 space-y-2">
                   <h3 className="text-sm font-semibold">Next step</h3>
                   <p className="text-sm leading-6 text-muted-foreground">
                     Use the report view for a cleaner stakeholder summary and

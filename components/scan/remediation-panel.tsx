@@ -20,7 +20,7 @@ export function RemediationPanel({ result }: RemediationPanelProps) {
       <CardContent className="space-y-4">
         <div className="rounded-2xl border p-4">
           <div className="flex items-center gap-2 text-sm font-medium">
-            <ShieldCheck className="size-4 text-primary" />
+            <ShieldCheck className="size-4 shrink-0 text-primary" />
             Immediate focus
           </div>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -37,18 +37,18 @@ export function RemediationPanel({ result }: RemediationPanelProps) {
             >
               <div className="flex items-start gap-3">
                 <div className="rounded-2xl border bg-background/70 p-2">
-                  <Wrench className="size-4 text-muted-foreground" />
+                  <Wrench className="size-4 shrink-0 text-muted-foreground" />
                 </div>
 
-                <div className="min-w-0">
-                  <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-medium">Action {index + 1}</p>
                     <span className="text-xs text-muted-foreground">
                       {action.count} finding{action.count > 1 ? "s" : ""}
                     </span>
                   </div>
 
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  <p className="mt-2 wrap-break-word text-sm leading-6 text-muted-foreground">
                     {action.remediation}
                   </p>
                 </div>
@@ -59,7 +59,7 @@ export function RemediationPanel({ result }: RemediationPanelProps) {
 
         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
           <div className="flex items-center gap-2 text-sm font-medium text-emerald-300">
-            <CheckCircle2 className="size-4" />
+            <CheckCircle2 className="size-4 shrink-0" />
             Goal
           </div>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">

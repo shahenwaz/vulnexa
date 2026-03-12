@@ -103,8 +103,10 @@ export function GroupedFindings({ result }: GroupedFindingsProps) {
                       <p className="text-sm font-medium">
                         Relevant code snippet
                       </p>
-                      <pre className="overflow-x-auto rounded-2xl border bg-background/80 p-4 text-xs leading-6 text-muted-foreground">
-                        <code>{finding.codeSnippet}</code>
+                      <pre className="overflow-x-auto whitespace-pre-wrap wrap-break-words rounded-2xl border bg-background/80 p-4 text-xs leading-6 text-muted-foreground ">
+                        <code className="wrap-break-word">
+                          {finding.codeSnippet}
+                        </code>
                       </pre>
                     </div>
                   ) : null}
