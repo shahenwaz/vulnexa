@@ -18,35 +18,35 @@ export function RemediationSummary({ result }: RemediationSummaryProps) {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border p-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <ShieldCheck className="size-4" />
+        <div className="grid grid-cols-1 gap-4">
+          <div className="rounded-2xl border border-border/70 p-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <ShieldCheck className="size-4 text-primary" />
               Priority focus
             </div>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Address critical and high severity findings first, then validate
               fixes with a follow-up scan.
             </p>
           </div>
 
-          <div className="rounded-2xl border p-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <ListChecks className="size-4" />
+          <div className="rounded-2xl border border-border/70 p-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <ListChecks className="size-4 text-primary" />
               Validation
             </div>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Re-test query handling, output encoding, configuration safety, and
               secret management after remediation.
             </p>
           </div>
 
-          <div className="rounded-2xl border p-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle2 className="size-4" />
+          <div className="rounded-2xl border border-border/70 p-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <CheckCircle2 className="size-4 text-primary" />
               Expected result
             </div>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Reduced exposure, cleaner production configuration, and a more
               trustworthy report for the final project demo.
             </p>
@@ -60,7 +60,7 @@ export function RemediationSummary({ result }: RemediationSummaryProps) {
             {actions.map((action, index) => (
               <div
                 key={`${action.remediation}-${index}`}
-                className="rounded-2xl border p-4"
+                className="rounded-2xl border border-border/70 p-4"
               >
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium">Action {index + 1}</p>
@@ -70,7 +70,7 @@ export function RemediationSummary({ result }: RemediationSummaryProps) {
                   </span>
                 </div>
 
-                <p className="mt-2 text-sm leading-7 text-muted-foreground">
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {action.remediation}
                 </p>
               </div>

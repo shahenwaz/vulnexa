@@ -318,6 +318,12 @@
     box-shadow: none !important;
   }
 
+  .lg\:sticky,
+  .xl\:sticky {
+    position: static !important;
+    top: auto !important;
+  }
+
   a {
     color: inherit !important;
     text-decoration: none !important;

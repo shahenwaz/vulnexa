@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { notFound, useParams } from "next/navigation";
 
 import { FindingCard } from "@/components/scan/finding-card";
 import { FindingsFilters } from "@/components/scan/findings-filters";
@@ -14,7 +15,14 @@ import { mockScanResult } from "@/lib/mock-data";
 import type { Severity } from "@/lib/types";
 
 export default function ScanDetailsPage() {
+  const params = useParams<{ scanId: string }>();
   const [filter, setFilter] = useState<Severity | "all">("all");
+
+  const scanId = params?.scanId;
+
+  if (scanId !== mockScanResult.scanId) {
+    notFound();
+  }
 
   const filteredFindings = useMemo(() => {
     if (filter === "all") return mockScanResult.findings;
