@@ -2,58 +2,70 @@ import { Clock3, FileCode2, FolderGit2, ShieldCheck } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatScanDate } from "@/lib/format";
-import { mockScanResult } from "@/lib/mock-data";
+import type { ScanResult } from "@/lib/types";
 
-export function ScanMetadataPanel() {
+type ScanMetadataPanelProps = {
+  result: ScanResult;
+};
+
+const metadataItems = [
+  {
+    key: "project",
+    label: "Project",
+    icon: FolderGit2,
+    getValue: (result: ScanResult) => result.projectName,
+  },
+  {
+    key: "files",
+    label: "Files scanned",
+    icon: FileCode2,
+    getValue: (result: ScanResult) => String(result.totalFiles),
+  },
+  {
+    key: "scannedAt",
+    label: "Scanned at",
+    icon: Clock3,
+    getValue: (result: ScanResult) => formatScanDate(result.scannedAt),
+  },
+  {
+    key: "scanId",
+    label: "Scan ID",
+    icon: ShieldCheck,
+    getValue: (result: ScanResult) => result.scanId,
+  },
+];
+
+export function ScanMetadataPanel({ result }: ScanMetadataPanelProps) {
   return (
-    <Card className="panel rounded-3xl border-border/70">
+    <Card>
       <CardHeader>
-        <div className="mb-3 flex size-12 items-center justify-center rounded-2xl bg-accent/10">
-          <ShieldCheck className="size-6 text-accent" />
-        </div>
-        <CardTitle className="text-xl tracking-tight">Scan metadata</CardTitle>
+        <CardTitle className="text-lg">Scan metadata</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <div className="rounded-2xl border border-border/60 bg-secondary/25 p-4">
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <FolderGit2 className="size-4 text-primary" />
-            <span className="font-medium text-foreground">Project</span>
-          </div>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            {mockScanResult.projectName}
-          </p>
-        </div>
+        {metadataItems.map((item) => {
+          const Icon = item.icon;
 
-        <div className="rounded-2xl border border-border/60 bg-secondary/25 p-4">
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <FileCode2 className="size-4 text-primary" />
-            <span className="font-medium text-foreground">Files scanned</span>
-          </div>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            {mockScanResult.totalFiles}
-          </p>
-        </div>
+          return (
+            <div
+              key={item.key}
+              className="flex items-start gap-3 rounded-2xl border p-4"
+            >
+              <div className="rounded-2xl border bg-background/70 p-2">
+                <Icon className="size-4 text-muted-foreground" />
+              </div>
 
-        <div className="rounded-2xl border border-border/60 bg-secondary/25 p-4">
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <Clock3 className="size-4 text-primary" />
-            <span className="font-medium text-foreground">Scanned at</span>
-          </div>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            {formatScanDate(mockScanResult.scannedAt)}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-border/60 bg-secondary/25 p-4">
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <ShieldCheck className="size-4 text-primary" />
-            <span className="font-medium text-foreground">Scan ID</span>
-          </div>
-          <p className="mt-2 break-all text-sm leading-6 text-muted-foreground">
-            {mockScanResult.scanId}
-          </p>
-        </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {item.label}
+                </p>
+                <p className="mt-1 break-words text-sm font-medium text-foreground">
+                  {item.getValue(result)}
+                </p>
+              </div>
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );
