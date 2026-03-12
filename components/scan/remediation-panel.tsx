@@ -1,34 +1,72 @@
-import { Wrench } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Wrench } from "lucide-react";
 
-import { mockScanResult } from "@/lib/mock-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getTopRemediationActions } from "@/lib/report";
+import type { ScanResult } from "@/lib/types";
 
-export function RemediationPanel() {
+type RemediationPanelProps = {
+  result: ScanResult;
+};
+
+export function RemediationPanel({ result }: RemediationPanelProps) {
+  const actions = getTopRemediationActions(result.findings).slice(0, 3);
+
   return (
-    <Card className="panel-glow rounded-3xl border-border/70">
+    <Card>
       <CardHeader>
-        <div className="mb-3 flex size-12 items-center justify-center rounded-2xl bg-primary/10">
-          <Wrench className="size-6 text-primary" />
-        </div>
-        <CardTitle className="text-xl tracking-tight">
-          Remediation guidance
-        </CardTitle>
+        <CardTitle className="text-lg">Remediation guidance</CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-3">
-        {mockScanResult.findings.slice(0, 3).map((finding) => (
-          <div
-            key={finding.id}
-            className="rounded-2xl border border-border/60 bg-card/60 p-4"
-          >
-            <p className="text-sm font-medium text-foreground">
-              {finding.title}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {finding.remediation}
-            </p>
+      <CardContent className="space-y-4">
+        <div className="rounded-2xl border p-4">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <ShieldCheck className="size-4 text-primary" />
+            Immediate focus
           </div>
-        ))}
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Prioritize critical and high-severity issues first, then validate
+            fixes with another scan run.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {actions.map((action, index) => (
+            <div
+              key={`${action.remediation}-${index}`}
+              className="rounded-2xl border p-4"
+            >
+              <div className="flex items-start gap-3">
+                <div className="rounded-2xl border bg-background/70 p-2">
+                  <Wrench className="size-4 text-muted-foreground" />
+                </div>
+
+                <div className="min-w-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium">Action {index + 1}</p>
+                    <span className="text-xs text-muted-foreground">
+                      {action.count} finding{action.count > 1 ? "s" : ""}
+                    </span>
+                  </div>
+
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {action.remediation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-emerald-300">
+            <CheckCircle2 className="size-4" />
+            Goal
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Reduce high-risk exposure and prepare a cleaner report outcome for
+            the final project review.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
