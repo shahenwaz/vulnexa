@@ -12,46 +12,12 @@ import { PageIntro } from "@/components/shared/page-intro";
 import { Button } from "@/components/ui/button";
 import { getDefaultScanSessionPreset } from "@/lib/scan-session";
 import { getSessionLinks } from "@/lib/scan-session-links";
-import type { ScanRunStatus, ScanSessionPreset } from "@/lib/types";
-
-function getNextStatus(status: ScanRunStatus): ScanRunStatus {
-  switch (status) {
-    case "draft":
-      return "queued";
-    case "queued":
-      return "running";
-    case "running":
-      return "completed";
-    case "completed":
-      return "draft";
-  }
-}
-
-function getEstimatedDuration(status: ScanRunStatus): string {
-  switch (status) {
-    case "draft":
-      return "Not started";
-    case "queued":
-      return "~ 2 min waiting time";
-    case "running":
-      return "~ 1 min remaining";
-    case "completed":
-      return "Completed";
-  }
-}
-
-function getStatusDescription(status: ScanRunStatus): string {
-  switch (status) {
-    case "draft":
-      return "Prepared scan configuration before analysis starts.";
-    case "queued":
-      return "The scan request is waiting for an available worker.";
-    case "running":
-      return "Analysis is currently processing files and building findings.";
-    case "completed":
-      return "The scan has finished and results are ready to review.";
-  }
-}
+import {
+  getNextScanRunStatus,
+  getScanRunStatusDescription,
+  getScanRunStatusDuration,
+} from "@/lib/scan-session-status";
+import type { ScanSessionPreset } from "@/lib/types";
 
 export default function NewScanPage() {
   const [session, setSession] = useState<ScanSessionPreset>(
@@ -61,13 +27,13 @@ export default function NewScanPage() {
   const sessionLinks = useMemo(() => getSessionLinks(session), [session]);
 
   function handleStartDemoScan() {
-    const nextStatus = getNextStatus(session.status);
+    const nextStatus = getNextScanRunStatus(session.status);
 
     setSession((current) => ({
       ...current,
       status: nextStatus,
-      estimatedDuration: getEstimatedDuration(nextStatus),
-      description: getStatusDescription(nextStatus),
+      estimatedDuration: getScanRunStatusDuration(nextStatus),
+      description: getScanRunStatusDescription(nextStatus),
     }));
   }
 
