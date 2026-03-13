@@ -37,16 +37,40 @@ export default function NewScanPage() {
     }));
   }
 
+  function handleResetSession() {
+    setSession(getDefaultScanSessionPreset());
+  }
+
+  function handleJumpToCompleted() {
+    setSession((current) => ({
+      ...current,
+      status: "completed",
+      estimatedDuration: getScanRunStatusDuration("completed"),
+      description: getScanRunStatusDescription("completed"),
+    }));
+  }
+
   const isCompleted = session.status === "completed";
 
   return (
     <div className="pb-10">
       <Container className="space-y-8 pt-6 md:space-y-10 md:pt-8">
-        <PageIntro
-          eyebrow="New scan"
-          title="Start a new security scan"
-          description="Create a believable scan session flow for the demo with configurable state, target details, and review-ready structure."
-        />
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+          <PageIntro
+            eyebrow="New scan"
+            title="Start a new security scan"
+            description="Create a believable scan session flow for the demo with configurable state, target details, and review-ready structure."
+          />
+
+          <div className="flex flex-wrap gap-3 xl:justify-end">
+            <Button asChild variant="outline" className="gap-2">
+              <Link href="/dashboard">
+                <LayoutDashboard className="size-4" />
+                Dashboard
+              </Link>
+            </Button>
+          </div>
+        </div>
 
         {isCompleted ? (
           <div className="panel-glow rounded-3xl border border-primary/20 bg-primary/8 p-5 md:p-6">
@@ -106,6 +130,8 @@ export default function NewScanPage() {
               value={session}
               onChange={setSession}
               onStartDemoScan={handleStartDemoScan}
+              onJumpToCompleted={handleJumpToCompleted}
+              onReset={handleResetSession}
             />
           </div>
 

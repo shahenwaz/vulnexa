@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { CheckCircle2, RotateCcw, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,8 @@ type ScanConfigurationFormProps = {
   value: ScanSessionPreset;
   onChange: (next: ScanSessionPreset) => void;
   onStartDemoScan: () => void;
+  onJumpToCompleted: () => void;
+  onReset: () => void;
 };
 
 const targetOptions: { value: ScanTargetType; label: string }[] = [
@@ -49,6 +51,8 @@ export function ScanConfigurationForm({
   value,
   onChange,
   onStartDemoScan,
+  onJumpToCompleted,
+  onReset,
 }: ScanConfigurationFormProps) {
   function applyPreset(preset: ScanSessionPreset) {
     onChange(preset);
@@ -67,19 +71,35 @@ export function ScanConfigurationForm({
   return (
     <Card className="border-border/60 bg-card/70">
       <CardHeader className="space-y-3">
-        <div className="flex items-center gap-2 text-primary">
-          <Sparkles className="size-4" />
-          <span className="text-sm font-medium">New scan flow</span>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-primary">
+              <Sparkles className="size-4" />
+              <span className="text-sm font-medium">New scan flow</span>
+            </div>
+
+            <div>
+              <CardTitle className="text-2xl font-semibold tracking-tight">
+                Configure a scan session
+              </CardTitle>
+
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Set a target, choose the scan scope, and preview how the session
+                behaves during your demo.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="gap-2 self-start"
+            onClick={onReset}
+          >
+            <RotateCcw className="size-4" />
+            Reset
+          </Button>
         </div>
-
-        <CardTitle className="text-2xl font-semibold tracking-tight">
-          Configure a scan session
-        </CardTitle>
-
-        <p className="text-sm leading-6 text-muted-foreground">
-          Set a target, choose the scan scope, and preview how the session
-          behaves during your demo.
-        </p>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -257,7 +277,7 @@ export function ScanConfigurationForm({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-secondary/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-secondary/20 p-4">
           <div>
             <p className="text-sm font-medium text-foreground">
               Demo scan execution
@@ -267,13 +287,25 @@ export function ScanConfigurationForm({
             </p>
           </div>
 
-          <Button
-            type="button"
-            className="rounded-2xl"
-            onClick={onStartDemoScan}
-          >
-            {getActionLabel(value.status)}
-          </Button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button
+              type="button"
+              className="rounded-2xl sm:flex-1"
+              onClick={onStartDemoScan}
+            >
+              {getActionLabel(value.status)}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2 rounded-2xl sm:flex-1"
+              onClick={onJumpToCompleted}
+            >
+              <CheckCircle2 className="size-4" />
+              Jump to completed
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
