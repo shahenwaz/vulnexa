@@ -1,29 +1,38 @@
+"use client";
+
+import { useState } from "react";
+
+import { ScanConfigurationForm } from "@/components/scan/scan-configuration-form";
 import { ScanReadinessPanel } from "@/components/scan/scan-readiness-panel";
-import { UploadPanel } from "@/components/scan/upload-panel";
+import { ScanSessionPreview } from "@/components/scan/scan-session-preview";
 import { Container } from "@/components/shared/container";
 import { PageIntro } from "@/components/shared/page-intro";
-import { Section } from "@/components/shared/section";
+import { getDefaultScanSessionPreset } from "@/lib/scan-session";
+import type { ScanSessionPreset } from "@/lib/types";
 
 export default function NewScanPage() {
+  const [session, setSession] = useState<ScanSessionPreset>(
+    getDefaultScanSessionPreset(),
+  );
+
   return (
-    <Section className="pt-10 md:pt-14">
-      <Container className="space-y-10">
+    <div className="pb-10">
+      <Container className="space-y-8 pt-6 md:space-y-10 md:pt-8">
         <PageIntro
           eyebrow="New scan"
-          title="Prepare a source code scan"
-          description="Set up your upload and scan context in a clean workflow designed for vulnerability assessment, remediation review, and later backend integration."
+          title="Start a new security scan"
+          description="Create a believable scan session flow for the demo with configurable state, target details, and review-ready structure."
         />
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_360px] xl:items-start">
-          <div>
-            <UploadPanel />
-          </div>
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_380px]">
+          <ScanConfigurationForm value={session} onChange={setSession} />
 
-          <div className="xl:sticky xl:top-24">
+          <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+            <ScanSessionPreview preset={session} />
             <ScanReadinessPanel />
           </div>
         </div>
       </Container>
-    </Section>
+    </div>
   );
 }
