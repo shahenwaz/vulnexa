@@ -56,3 +56,52 @@ export type ScanSessionPreset = {
   includeDependencies: boolean;
   includeConfiguration: boolean;
 };
+
+export type CreateScanRequest = {
+  projectName: string;
+  targetType: ScanTargetType;
+  targetValue: string;
+  notes?: string;
+  options: {
+    includeSecrets: boolean;
+    includeDependencies: boolean;
+    includeConfiguration: boolean;
+  };
+};
+
+export type CreateScanResponse = {
+  sessionId: string;
+  scanId?: string;
+  status: Exclude<ScanRunStatus, "draft">;
+  projectName: string;
+  createdAt: string;
+  estimatedDuration?: string;
+  message?: string;
+};
+
+export type ScanSessionStatusResponse = {
+  sessionId: string;
+  scanId?: string;
+  projectName: string;
+  status: Exclude<ScanRunStatus, "draft">;
+  progressPercent?: number;
+  currentStage?: string;
+  message?: string;
+  startedAt?: string;
+  updatedAt: string;
+  completedAt?: string;
+};
+
+export type ScanSessionResultResponse = {
+  sessionId: string;
+  scanId: string;
+  status: "completed";
+  result: ScanResult;
+};
+
+export type ApiErrorResponse = {
+  error: {
+    code: string;
+    message: string;
+  };
+};
