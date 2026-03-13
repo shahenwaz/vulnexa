@@ -206,7 +206,11 @@ export function ScanSessionPreview({ preset }: ScanSessionPreviewProps) {
                     Scan completed successfully
                   </p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Demo session linked to{" "}
+                    Demo session matched to{" "}
+                    <span className="font-medium text-foreground">
+                      {links.projectName}
+                    </span>{" "}
+                    with result ID{" "}
                     <span className="font-medium text-foreground">
                       {links.scanId}
                     </span>
