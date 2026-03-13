@@ -30,7 +30,21 @@ function getMatchByProjectName(projectName: string): ScanHistoryItem | null {
   );
 }
 
-export function getSessionLinks(preset: ScanSessionPreset): ScanSessionLinks {
+export function getSessionLinks(
+  preset: ScanSessionPreset,
+  resolvedScanId?: string | null,
+): ScanSessionLinks {
+  if (resolvedScanId && getScanResultById(resolvedScanId)) {
+    const resolvedResult = getScanResultById(resolvedScanId)!;
+
+    return {
+      scanId: resolvedScanId,
+      projectName: resolvedResult.projectName,
+      scanHref: `/scans/${resolvedScanId}`,
+      reportHref: `/reports/${resolvedScanId}`,
+    };
+  }
+
   const matchedHistoryItem = getMatchByProjectName(preset.projectName);
 
   if (matchedHistoryItem && getScanResultById(matchedHistoryItem.scanId)) {

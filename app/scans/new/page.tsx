@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, LayoutDashboard } from "lucide-react";
 
+import { createScan, advanceScanSession } from "@/lib/api/scan-service";
+import { mapSessionPresetToCreateScanRequest } from "@/lib/api/scan-mappers";
 import { ScanConfigurationForm } from "@/components/scan/scan-configuration-form";
 import { ScanReadinessPanel } from "@/components/scan/scan-readiness-panel";
 import { ScanSessionPreview } from "@/components/scan/scan-session-preview";
@@ -13,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { getDefaultScanSessionPreset } from "@/lib/scan-session";
 import { getSessionLinks } from "@/lib/scan-session-links";
 import {
-  getNextScanRunStatus,
   getScanRunStatusDescription,
   getScanRunStatusDuration,
 } from "@/lib/scan-session-status";
@@ -23,22 +24,67 @@ export default function NewScanPage() {
   const [session, setSession] = useState<ScanSessionPreset>(
     getDefaultScanSessionPreset(),
   );
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [resolvedScanId, setResolvedScanId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const sessionLinks = useMemo(() => getSessionLinks(session), [session]);
+  const sessionLinks = useMemo(
+    () => getSessionLinks(session, resolvedScanId),
+    [session, resolvedScanId],
+  );
 
-  function handleStartDemoScan() {
-    const nextStatus = getNextScanRunStatus(session.status);
+  async function handleStartDemoScan() {
+    if (isSubmitting) {
+      return;
+    }
 
-    setSession((current) => ({
-      ...current,
-      status: nextStatus,
-      estimatedDuration: getScanRunStatusDuration(nextStatus),
-      description: getScanRunStatusDescription(nextStatus),
-    }));
+    setIsSubmitting(true);
+
+    try {
+      if (!sessionId) {
+        const payload = mapSessionPresetToCreateScanRequest(session);
+        const created = await createScan(payload);
+
+        setSessionId(created.sessionId);
+        setResolvedScanId(created.scanId ?? null);
+
+        setSession((current) => ({
+          ...current,
+          status: created.status,
+          estimatedDuration:
+            created.estimatedDuration ??
+            getScanRunStatusDuration(created.status),
+          description:
+            created.message ?? getScanRunStatusDescription(created.status),
+        }));
+
+        return;
+      }
+
+      const next = await advanceScanSession(sessionId);
+
+      if (!next) {
+        return;
+      }
+
+      setResolvedScanId(next.scanId ?? null);
+
+      setSession((current) => ({
+        ...current,
+        projectName: next.projectName,
+        status: next.status,
+        estimatedDuration: getScanRunStatusDuration(next.status),
+        description: next.message ?? getScanRunStatusDescription(next.status),
+      }));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function handleResetSession() {
     setSession(getDefaultScanSessionPreset());
+    setSessionId(null);
+    setResolvedScanId(null);
   }
 
   function handleJumpToCompleted() {
@@ -132,6 +178,7 @@ export default function NewScanPage() {
               onStartDemoScan={handleStartDemoScan}
               onJumpToCompleted={handleJumpToCompleted}
               onReset={handleResetSession}
+              isSubmitting={isSubmitting}
             />
           </div>
 

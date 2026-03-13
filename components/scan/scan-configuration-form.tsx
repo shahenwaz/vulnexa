@@ -19,6 +19,7 @@ type ScanConfigurationFormProps = {
   onStartDemoScan: () => void;
   onJumpToCompleted: () => void;
   onReset: () => void;
+  isSubmitting?: boolean;
 };
 
 const targetOptions: { value: ScanTargetType; label: string }[] = [
@@ -53,6 +54,7 @@ export function ScanConfigurationForm({
   onStartDemoScan,
   onJumpToCompleted,
   onReset,
+  isSubmitting = false,
 }: ScanConfigurationFormProps) {
   function applyPreset(preset: ScanSessionPreset) {
     onChange(preset);
@@ -283,7 +285,7 @@ export function ScanConfigurationForm({
               Demo scan execution
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Advance the session state without backend execution.
+              Advance the session state through the service layer.
             </p>
           </div>
 
@@ -292,8 +294,9 @@ export function ScanConfigurationForm({
               type="button"
               className="rounded-2xl sm:flex-1"
               onClick={onStartDemoScan}
+              disabled={isSubmitting}
             >
-              {getActionLabel(value.status)}
+              {isSubmitting ? "Updating..." : getActionLabel(value.status)}
             </Button>
 
             <Button
