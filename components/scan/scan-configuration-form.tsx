@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Play, Shield, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +16,7 @@ import type {
 type ScanConfigurationFormProps = {
   value: ScanSessionPreset;
   onChange: (next: ScanSessionPreset) => void;
+  onStartDemoScan: () => void;
 };
 
 const targetOptions: { value: ScanTargetType; label: string }[] = [
@@ -32,14 +32,25 @@ const statusOptions: { value: ScanRunStatus; label: string }[] = [
   { value: "completed", label: "Completed" },
 ];
 
+function getActionLabel(status: ScanRunStatus) {
+  switch (status) {
+    case "draft":
+      return "Queue scan";
+    case "queued":
+      return "Start analysis";
+    case "running":
+      return "Mark as completed";
+    case "completed":
+      return "Restart demo flow";
+  }
+}
+
 export function ScanConfigurationForm({
   value,
   onChange,
+  onStartDemoScan,
 }: ScanConfigurationFormProps) {
-  const [activePresetId, setActivePresetId] = useState(value.id);
-
   function applyPreset(preset: ScanSessionPreset) {
-    setActivePresetId(preset.id);
     onChange(preset);
   }
 
@@ -57,7 +68,7 @@ export function ScanConfigurationForm({
     <Card className="border-border/60 bg-card/70">
       <CardHeader className="space-y-3">
         <div className="flex items-center gap-2 text-primary">
-          <Shield className="size-4" />
+          <Sparkles className="size-4" />
           <span className="text-sm font-medium">New scan flow</span>
         </div>
 
@@ -66,21 +77,20 @@ export function ScanConfigurationForm({
         </CardTitle>
 
         <p className="text-sm leading-6 text-muted-foreground">
-          Set a target, choose the scan scope, and preview how the session will
-          appear during your demo.
+          Set a target, choose the scan scope, and preview how the session
+          behaves during your demo.
         </p>
       </CardHeader>
 
       <CardContent className="space-y-6">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <Sparkles className="size-4 text-primary" />
+          <div className="text-sm font-medium text-foreground">
             Demo presets
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             {mockScanSessionPresets.map((preset) => {
-              const isActive = preset.id === activePresetId;
+              const isActive = preset.id === value.id;
 
               return (
                 <button
@@ -97,7 +107,7 @@ export function ScanConfigurationForm({
                   <p className="text-sm font-medium text-foreground">
                     {preset.label}
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  <p className="mt-1 text-xs leading-5 capitalize text-muted-foreground">
                     {preset.status}
                   </p>
                 </button>
@@ -250,17 +260,19 @@ export function ScanConfigurationForm({
         <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-secondary/20 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium text-foreground">
-              Ready for demo flow
+              Demo scan execution
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              This form updates the preview state now and can connect to backend
-              execution later.
+              Advance the session state without backend execution.
             </p>
           </div>
 
-          <Button type="button" className="gap-2 rounded-2xl">
-            <Play className="size-4" />
-            Start scan
+          <Button
+            type="button"
+            className="rounded-2xl"
+            onClick={onStartDemoScan}
+          >
+            {getActionLabel(value.status)}
           </Button>
         </div>
       </CardContent>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  CheckCircle2,
   Clock3,
   FolderGit2,
   LoaderCircle,
@@ -24,6 +25,8 @@ const statusLabelMap: Record<ScanRunStatus, string> = {
   completed: "Completed",
 };
 
+const flowSteps: ScanRunStatus[] = ["draft", "queued", "running", "completed"];
+
 const statusBadgeVariantMap: Record<
   ScanRunStatus,
   "secondary" | "outline" | "default"
@@ -45,6 +48,21 @@ function getStatusIcon(status: ScanRunStatus) {
     case "completed":
       return <ShieldCheck className="size-4" />;
   }
+}
+
+function getStepState(current: ScanRunStatus, step: ScanRunStatus) {
+  const currentIndex = flowSteps.indexOf(current);
+  const stepIndex = flowSteps.indexOf(step);
+
+  if (stepIndex < currentIndex) {
+    return "done";
+  }
+
+  if (stepIndex === currentIndex) {
+    return "current";
+  }
+
+  return "upcoming";
 }
 
 export function ScanSessionPreview({ preset }: ScanSessionPreviewProps) {
@@ -71,6 +89,51 @@ export function ScanSessionPreview({ preset }: ScanSessionPreviewProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
+        <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+            Scan flow
+          </p>
+
+          <div className="mt-3 space-y-3">
+            {flowSteps.map((step) => {
+              const state = getStepState(preset.status, step);
+
+              return (
+                <div key={step} className="flex items-center gap-3">
+                  <div
+                    className={[
+                      "flex size-8 items-center justify-center rounded-full border",
+                      state === "done"
+                        ? "border-primary/30 bg-primary/10 text-primary"
+                        : state === "current"
+                          ? "border-primary/40 bg-primary/10 text-primary"
+                          : "border-border/60 bg-background/50 text-muted-foreground",
+                    ].join(" ")}
+                  >
+                    {state === "done" ? (
+                      <CheckCircle2 className="size-4" />
+                    ) : (
+                      getStatusIcon(step)
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium capitalize text-foreground">
+                      {statusLabelMap[step]}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {step === "draft" && "Configuration prepared"}
+                      {step === "queued" && "Waiting for worker allocation"}
+                      {step === "running" && "Analysis currently in progress"}
+                      {step === "completed" && "Results ready to review"}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
             <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
@@ -128,16 +191,25 @@ export function ScanSessionPreview({ preset }: ScanSessionPreviewProps) {
         </div>
 
         {preset.status === "completed" ? (
-          <Button asChild className="w-full gap-2">
-            <Link href="/scans/scan_001">
-              Open latest scan result
-              <ArrowRight className="size-4" />
-            </Link>
-          </Button>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button asChild className="w-full gap-2">
+              <Link href="/scans/scan_001">
+                Open scan result
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+
+            <Button asChild variant="outline" className="w-full gap-2">
+              <Link href="/reports/scan_001">
+                Open report
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-border/60 bg-background/30 p-4 text-sm text-muted-foreground">
-            This is a demo session preview. Backend execution can be connected
-            later without changing the page structure.
+            This preview updates live as you move the session through the demo
+            states.
           </div>
         )}
       </CardContent>
