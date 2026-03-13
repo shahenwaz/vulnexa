@@ -176,6 +176,58 @@ export const mockScanResults: ScanResult[] = [
       },
     ],
   },
+  {
+    scanId: "scan_003",
+    projectName: "internal-admin-dashboard",
+    scannedAt: "2026-03-09T18:45:00Z",
+    totalFiles: 65,
+    totalFindings: 2,
+    severityCounts: {
+      critical: 0,
+      high: 0,
+      medium: 1,
+      low: 1,
+      info: 0,
+    },
+    findings: [
+      {
+        id: "finding_009",
+        ruleId: "auth.missing-rate-limit",
+        title: "Login endpoint missing rate limiting",
+        severity: "medium",
+        status: "open",
+        description:
+          "The authentication endpoint appears to accept repeated requests without visible throttling or lockout protection.",
+        impact:
+          "Attackers may attempt credential stuffing or brute-force login attempts at a higher rate.",
+        filePath: "src/app/api/auth/login/route.ts",
+        line: 17,
+        cwe: "CWE-307",
+        confidence: "medium",
+        remediation:
+          "Add per-user and per-IP rate limiting with temporary lockout rules for repeated failures.",
+        codeSnippet: `return NextResponse.json({ success: false }, { status: 401 });`,
+      },
+      {
+        id: "finding_010",
+        ruleId: "config.cors-wildcard-origin",
+        title: "Wildcard CORS origin allowed",
+        severity: "low",
+        status: "reviewing",
+        description:
+          "CORS configuration appears to allow requests from any origin in a deployment-oriented environment.",
+        impact:
+          "Overly broad cross-origin access can increase exposure of internal APIs and weakens origin trust boundaries.",
+        filePath: "src/lib/cors.ts",
+        line: 9,
+        cwe: "CWE-942",
+        confidence: "medium",
+        remediation:
+          "Restrict allowed origins to known frontend domains and separate development from production configuration.",
+        codeSnippet: `origin: "*"`,
+      },
+    ],
+  },
 ];
 
 export const mockScanHistory: ScanHistoryItem[] = [
@@ -201,10 +253,10 @@ export const mockScanHistory: ScanHistoryItem[] = [
     scanId: "scan_003",
     projectName: "internal-admin-dashboard",
     scannedAt: "2026-03-09T18:45:00Z",
-    status: "queued",
+    status: "completed",
     totalFiles: 65,
-    totalFindings: 0,
-    highestSeverity: "info",
+    totalFindings: 2,
+    highestSeverity: "medium",
   },
 ];
 
