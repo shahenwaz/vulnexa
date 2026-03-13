@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSessionLinks } from "@/lib/scan-session-links";
 import type { ScanRunStatus, ScanSessionPreset } from "@/lib/types";
 
 type ScanSessionPreviewProps = {
@@ -66,6 +67,8 @@ function getStepState(current: ScanRunStatus, step: ScanRunStatus) {
 }
 
 export function ScanSessionPreview({ preset }: ScanSessionPreviewProps) {
+  const links = getSessionLinks(preset);
+
   return (
     <Card className="border-border/60 bg-card/70">
       <CardHeader className="space-y-3">
@@ -191,25 +194,56 @@ export function ScanSessionPreview({ preset }: ScanSessionPreviewProps) {
         </div>
 
         {preset.status === "completed" ? (
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Button asChild className="w-full gap-2">
-              <Link href="/scans/scan_001">
-                Open scan result
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
+          <div className="space-y-3">
+            <div className="rounded-2xl border border-primary/20 bg-primary/8 p-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex size-9 items-center justify-center rounded-full bg-primary/12 text-primary">
+                  <CheckCircle2 className="size-4" />
+                </div>
 
-            <Button asChild variant="outline" className="w-full gap-2">
-              <Link href="/reports/scan_001">
-                Open report
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    Scan completed successfully
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Demo session linked to{" "}
+                    <span className="font-medium text-foreground">
+                      {links.scanId}
+                    </span>
+                    . You can now continue into the detailed scan or stakeholder
+                    report flow.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Button asChild className="w-full gap-2">
+                <Link href={links.scanHref}>
+                  View scan
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+
+              <Button asChild variant="outline" className="w-full gap-2">
+                <Link href={links.reportHref}>
+                  Open report
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            </div>
+
+            <Button asChild variant="ghost" className="w-full gap-2">
+              <Link href="/dashboard">
+                Back to dashboard
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-border/60 bg-background/30 p-4 text-sm text-muted-foreground">
-            This preview updates live as you move the session through the demo
-            states.
+            Advance the session state from the form to simulate a full scan
+            lifecycle for the demo.
           </div>
         )}
       </CardContent>
