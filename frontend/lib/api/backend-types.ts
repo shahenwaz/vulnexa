@@ -26,6 +26,7 @@ export type BackendScanResult = {
   status: string;
   summary: BackendScanSummary;
   findings: BackendFinding[];
+  scanned_files: number;
   saved_to?: string;
   source_type?: string;
   uploaded_file_name?: string;

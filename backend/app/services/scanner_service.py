@@ -1,9 +1,9 @@
 """Service for scanning source files for simple insecure code patterns."""
 
-from pathlib import Path
-from typing import Literal, TypedDict
 from datetime import datetime
+from pathlib import Path
 import secrets
+from typing import Literal, TypedDict
 
 from app.services.cwe_service import get_cwe_summary
 
@@ -61,6 +61,7 @@ class ScanResult(TypedDict, total=False):
     status: str
     summary: Summary
     findings: list[Finding]
+    scanned_files: int
     saved_to: str
     source_type: str
     uploaded_file_name: str
@@ -134,6 +135,7 @@ def scan_directory(directory_path: str) -> ScanResult:
     """Scan a directory recursively for files matching predefined security rules."""
     findings: list[Finding] = []
     cwe_cache: dict[str, CweSummary] = {}
+    scanned_files = 0
 
     root = Path(directory_path)
 
@@ -151,6 +153,8 @@ def scan_directory(directory_path: str) -> ScanResult:
 
         if file_path.suffix.lower() not in ALLOWED_EXTENSIONS:
             continue
+
+        scanned_files += 1
 
         try:
             content = file_path.read_text(encoding="utf-8", errors="ignore")
@@ -188,6 +192,7 @@ def scan_directory(directory_path: str) -> ScanResult:
         "status": "completed",
         "summary": build_summary(findings),
         "findings": findings,
+        "scanned_files": scanned_files,
     }
 
     return scan_result

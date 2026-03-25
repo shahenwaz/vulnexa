@@ -26,6 +26,31 @@ function mapBackendFindingToUiFinding(finding: BackendFinding): ScanFinding {
   };
 }
 
+function stripZipExtension(fileName: string): string {
+  return fileName.replace(/\.zip$/i, "");
+}
+
+function getLastPathSegment(path: string): string {
+  return path.split(/[\\/]/).filter(Boolean).pop() ?? path;
+}
+
+function getRepoNameFromUrl(repoUrl: string): string {
+  const cleaned = repoUrl.replace(/\/$/, "");
+  return cleaned.split("/").pop() ?? repoUrl;
+}
+
+function getScanDisplayName(scan: BackendScanResult): string {
+  if (scan.repo_url) {
+    return getRepoNameFromUrl(scan.repo_url);
+  }
+
+  if (scan.uploaded_file_name) {
+    return stripZipExtension(scan.uploaded_file_name);
+  }
+
+  return getLastPathSegment(scan.target);
+}
+
 export function mapBackendScanResultToUiScanResult(
   scan: BackendScanResult,
 ): ScanResult {
@@ -33,9 +58,9 @@ export function mapBackendScanResultToUiScanResult(
 
   return {
     scanId: scan.scan_id,
-    projectName: scan.repo_url ?? scan.uploaded_file_name ?? scan.target,
+    projectName: getScanDisplayName(scan),
     scannedAt: new Date().toISOString(),
-    totalFiles: 0,
+    totalFiles: scan.scanned_files,
     totalFindings: scan.summary.total_findings,
     severityCounts: {
       critical: scan.summary.critical,
