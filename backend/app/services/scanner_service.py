@@ -62,6 +62,8 @@ class ScanResult(TypedDict, total=False):
     summary: Summary
     findings: list[Finding]
     saved_to: str
+    source_type: str
+    uploaded_file_name: str
 
 
 RULES: list[Rule] = [
