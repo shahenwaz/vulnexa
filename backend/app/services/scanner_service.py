@@ -171,7 +171,7 @@ def scan_directory(directory_path: str) -> ScanResult:
                             "id": f"finding-{finding_counter:03}",
                             "title": rule["name"],
                             "severity": rule["severity"],
-                            "file": str(file_path),
+                            "file": str(file_path.relative_to(root)).replace("\\", "/"),
                             "line": line_number,
                             "matched_text": line.strip(),
                             "cwe_id": cwe_id,
