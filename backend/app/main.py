@@ -1,8 +1,8 @@
 """Main FastAPI application for the Vulnexa backend."""
 
 from fastapi import FastAPI
-
 from app.api.cwe import router as cwe_router
+from app.api.scan import router as scan_router
 
 app = FastAPI(
     title="Vulnexa Backend",
@@ -10,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(cwe_router)
+app.include_router(scan_router)
 
 
 @app.get("/")
