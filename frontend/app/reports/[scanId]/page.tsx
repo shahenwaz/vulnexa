@@ -7,7 +7,9 @@ import { ReportHeader } from "@/components/reports/report-header";
 import { SeveritySummaryTable } from "@/components/reports/severity-summary-table";
 import { Container } from "@/components/shared/container";
 import { Section } from "@/components/shared/section";
-import { getScanResultById } from "@/lib/mock-data";
+import { mapBackendScanResultToUiScanResult } from "@/lib/api/backend-mappers";
+import { getScanById } from "@/lib/api/scan-service";
+import type { ScanResult } from "@/lib/types";
 
 type ReportPageProps = {
   params: Promise<{
@@ -17,9 +19,13 @@ type ReportPageProps = {
 
 export default async function ReportPage({ params }: ReportPageProps) {
   const { scanId } = await params;
-  const result = getScanResultById(scanId);
 
-  if (!result) {
+  let result: ScanResult;
+
+  try {
+    const backendResult = await getScanById(scanId);
+    result = mapBackendScanResultToUiScanResult(backendResult);
+  } catch {
     notFound();
   }
 
