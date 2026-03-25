@@ -1,6 +1,7 @@
 export const scanApiEndpoints = {
-  createScan: "/api/scans",
-  getScanSessionStatus: (sessionId: string) =>
-    `/api/scans/sessions/${sessionId}`,
-  getScanSessionResult: (scanId: string) => `/api/scans/${scanId}`,
+  createLocalScan: "/scan/local",
+  createRepoScan: "/scan/repo",
+  createUploadScan: "/scan/upload",
+  listScans: "/scan",
+  getScanById: (scanId: string) => `/scan/${scanId}`,
 } as const;
