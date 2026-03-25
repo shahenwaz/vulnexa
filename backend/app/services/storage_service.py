@@ -28,6 +28,8 @@ def save_scan_result(scan_result: dict[str, Any]) -> str:
 
 def load_scan_result(scan_id: str) -> dict[str, Any] | None:
     """Load a scan result by scan ID."""
+    ensure_data_dir()
+
     file_path = DATA_DIR / f"{scan_id}.json"
 
     if not file_path.exists():
@@ -35,3 +37,25 @@ def load_scan_result(scan_id: str) -> dict[str, Any] | None:
 
     with file_path.open("r", encoding="utf-8") as file:
         return json.load(file)
+
+
+def list_scan_results() -> list[dict[str, Any]]:
+    """Return a lightweight list of saved scan summaries."""
+    ensure_data_dir()
+
+    scans: list[dict[str, Any]] = []
+
+    for file_path in sorted(DATA_DIR.glob("*.json"), reverse=True):
+        with file_path.open("r", encoding="utf-8") as file:
+            scan = json.load(file)
+
+        scans.append(
+            {
+                "scan_id": scan["scan_id"],
+                "target": scan["target"],
+                "status": scan["status"],
+                "summary": scan["summary"],
+            }
+        )
+
+    return scans
