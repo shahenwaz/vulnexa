@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 
 import { ScanDetailsView } from "@/components/scan/scan-details-view";
-import { getScanResultById } from "@/lib/mock-data";
+import { mapBackendScanResultToUiScanResult } from "@/lib/api/backend-mappers";
+import { getScanById } from "@/lib/api/scan-service";
+import type { ScanResult } from "@/lib/types";
 
 type ScanDetailsPageProps = {
   params: Promise<{
@@ -13,9 +15,13 @@ export default async function ScanDetailsPage({
   params,
 }: ScanDetailsPageProps) {
   const { scanId } = await params;
-  const result = getScanResultById(scanId);
 
-  if (!result) {
+  let result: ScanResult;
+
+  try {
+    const backendResult = await getScanById(scanId);
+    result = mapBackendScanResultToUiScanResult(backendResult);
+  } catch {
     notFound();
   }
 
