@@ -2,10 +2,15 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, LayoutDashboard } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  LayoutDashboard,
+} from "lucide-react";
 
-import { createScan, advanceScanSession } from "@/lib/api/scan-service";
-import { mapSessionPresetToCreateScanRequest } from "@/lib/api/scan-mappers";
+import { createBackendScanFromSession } from "@/lib/api/create-backend-scan";
 import { ScanConfigurationForm } from "@/components/scan/scan-configuration-form";
 import { ScanReadinessPanel } from "@/components/scan/scan-readiness-panel";
 import { ScanSessionPreview } from "@/components/scan/scan-session-preview";
@@ -21,60 +26,62 @@ import {
 import type { ScanSessionPreset } from "@/lib/types";
 
 export default function NewScanPage() {
+  const router = useRouter();
+
   const [session, setSession] = useState<ScanSessionPreset>(
     getDefaultScanSessionPreset(),
   );
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [resolvedScanId, setResolvedScanId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const sessionLinks = useMemo(
     () => getSessionLinks(session, resolvedScanId),
     [session, resolvedScanId],
   );
 
-  async function handleStartDemoScan() {
+  async function handleStartScan() {
     if (isSubmitting) {
       return;
     }
 
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
-      if (!sessionId) {
-        const payload = mapSessionPresetToCreateScanRequest(session);
-        const created = await createScan(payload);
+      setSession((current) => ({
+        ...current,
+        status: "queued",
+        estimatedDuration: getScanRunStatusDuration("queued"),
+        description: getScanRunStatusDescription("queued"),
+      }));
 
-        setSessionId(created.sessionId);
-        setResolvedScanId(created.scanId ?? null);
+      const created = await createBackendScanFromSession(session);
 
-        setSession((current) => ({
-          ...current,
-          status: created.status,
-          estimatedDuration:
-            created.estimatedDuration ??
-            getScanRunStatusDuration(created.status),
-          description:
-            created.message ?? getScanRunStatusDescription(created.status),
-        }));
-
-        return;
-      }
-
-      const next = await advanceScanSession(sessionId);
-
-      if (!next) {
-        return;
-      }
-
-      setResolvedScanId(next.scanId ?? null);
+      setResolvedScanId(created.scan_id);
 
       setSession((current) => ({
         ...current,
-        projectName: next.projectName,
-        status: next.status,
-        estimatedDuration: getScanRunStatusDuration(next.status),
-        description: next.message ?? getScanRunStatusDescription(next.status),
+        status: "completed",
+        estimatedDuration: getScanRunStatusDuration("completed"),
+        description: "Backend scan completed and results are ready to review.",
+        projectName: current.projectName || created.scan_id,
+      }));
+
+      router.push(`/scans/${created.scan_id}`);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to create scan. Please try again.";
+
+      setSubmitError(message);
+
+      setSession((current) => ({
+        ...current,
+        status: "draft",
+        estimatedDuration: getScanRunStatusDuration("draft"),
+        description: "Update the scan settings and try again.",
       }));
     } finally {
       setIsSubmitting(false);
@@ -83,8 +90,8 @@ export default function NewScanPage() {
 
   function handleResetSession() {
     setSession(getDefaultScanSessionPreset());
-    setSessionId(null);
     setResolvedScanId(null);
+    setSubmitError(null);
   }
 
   function handleJumpToCompleted() {
@@ -105,7 +112,7 @@ export default function NewScanPage() {
           <PageIntro
             eyebrow="New scan"
             title="Start a new security scan"
-            description="Create a believable scan session flow for the demo with configurable state, target details, and review-ready structure."
+            description="Submit a real scan request to the backend and move directly into the saved scan results."
           />
 
           <div className="flex flex-wrap gap-3 xl:justify-end">
@@ -118,7 +125,24 @@ export default function NewScanPage() {
           </div>
         </div>
 
-        {isCompleted ? (
+        {submitError ? (
+          <div className="rounded-3xl border border-destructive/25 bg-destructive/10 p-5 text-sm text-destructive md:p-6">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-2xl bg-destructive/15">
+                <AlertCircle className="size-5" />
+              </div>
+
+              <div className="space-y-1">
+                <h2 className="text-base font-semibold text-foreground">
+                  Scan could not be created
+                </h2>
+                <p className="leading-6 text-muted-foreground">{submitError}</p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {isCompleted && resolvedScanId ? (
           <div className="panel-glow rounded-3xl border border-primary/20 bg-primary/8 p-5 md:p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-start gap-3">
@@ -138,8 +162,7 @@ export default function NewScanPage() {
                     <span className="font-medium text-foreground">
                       {sessionLinks.scanId}
                     </span>
-                    . Continue into the detailed scan view, open the report, or
-                    return to the dashboard.
+                    .
                   </p>
                 </div>
               </div>
@@ -158,13 +181,6 @@ export default function NewScanPage() {
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-
-                <Button asChild variant="ghost" className="gap-2">
-                  <Link href="/dashboard">
-                    <LayoutDashboard className="size-4" />
-                    Dashboard
-                  </Link>
-                </Button>
               </div>
             </div>
           </div>
@@ -175,7 +191,7 @@ export default function NewScanPage() {
             <ScanConfigurationForm
               value={session}
               onChange={setSession}
-              onStartDemoScan={handleStartDemoScan}
+              onStartScan={handleStartScan}
               onJumpToCompleted={handleJumpToCompleted}
               onReset={handleResetSession}
               isSubmitting={isSubmitting}

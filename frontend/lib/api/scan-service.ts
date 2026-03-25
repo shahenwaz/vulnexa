@@ -18,7 +18,21 @@ async function fetchJson<T>(input: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
+    let message = `Request failed with status ${response.status}`;
+
+    try {
+      const errorBody = (await response.json()) as {
+        detail?: string;
+      };
+
+      if (errorBody?.detail) {
+        message = errorBody.detail;
+      }
+    } catch {
+      // Keep fallback message
+    }
+
+    throw new Error(message);
   }
 
   return response.json() as Promise<T>;
