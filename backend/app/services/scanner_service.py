@@ -2,6 +2,8 @@
 
 from pathlib import Path
 from typing import Literal, TypedDict
+from datetime import datetime
+import secrets
 
 from app.services.cwe_service import get_cwe_summary
 
@@ -59,6 +61,7 @@ class ScanResult(TypedDict, total=False):
     status: str
     summary: Summary
     findings: list[Finding]
+    saved_to: str
 
 
 RULES: list[Rule] = [
@@ -117,6 +120,13 @@ def build_summary(findings: list[Finding]) -> Summary:
     return summary
 
 
+def generate_scan_id() -> str:
+    """Generate a short readable unique scan ID."""
+    date_part = datetime.now().strftime("%Y%m%d")
+    random_part = secrets.token_hex(2).upper()
+    return f"SCN-{date_part}-{random_part}"
+
+
 def scan_directory(directory_path: str) -> ScanResult:
     """Scan a directory recursively for files matching predefined security rules."""
     findings: list[Finding] = []
@@ -169,10 +179,12 @@ def scan_directory(directory_path: str) -> ScanResult:
                     )
                     finding_counter += 1
 
-    return {
-        "scan_id": "scan-001",
+    scan_result: ScanResult = {
+        "scan_id": generate_scan_id(),
         "target": str(root),
         "status": "completed",
         "summary": build_summary(findings),
         "findings": findings,
     }
+
+    return scan_result
