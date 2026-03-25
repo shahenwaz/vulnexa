@@ -49,13 +49,17 @@ def list_scan_results() -> list[dict[str, Any]]:
         with file_path.open("r", encoding="utf-8") as file:
             scan = json.load(file)
 
-        scans.append(
-            {
-                "scan_id": scan["scan_id"],
-                "target": scan["target"],
-                "status": scan["status"],
-                "summary": scan["summary"],
-            }
-        )
+            scans.append(
+                {
+                    "scan_id": scan["scan_id"],
+                    "target": scan["target"],
+                    "status": scan["status"],
+                    "summary": scan["summary"],
+                    "scanned_files": scan.get("scanned_files", 0),
+                    "source_type": scan.get("source_type"),
+                    "uploaded_file_name": scan.get("uploaded_file_name"),
+                    "repo_url": scan.get("repo_url"),
+                }
+            )
 
     return scans

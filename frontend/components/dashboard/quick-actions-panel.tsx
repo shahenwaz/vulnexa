@@ -1,27 +1,14 @@
 import Link from "next/link";
-import { FileText, Plus, ShieldCheck, WandSparkles } from "lucide-react";
+import { Plus, WandSparkles } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const actions = [
   {
     title: "Start a new scan",
-    description: "Prepare a fresh upload and scan workflow for a project.",
+    description: "Run a fresh local, upload, or repository-based scan.",
     href: "/scans/new",
     icon: Plus,
-  },
-  {
-    title: "Review demo results",
-    description: "Open the mock scan result page and inspect findings.",
-    href: "/scans/scan_001",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Open security report",
-    description:
-      "Review the executive summary, grouped findings, and remediation plan.",
-    href: "/reports/scan_001",
-    icon: FileText,
   },
 ];
 

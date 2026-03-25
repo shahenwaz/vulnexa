@@ -38,6 +38,10 @@ export type BackendScanListItem = {
   target: string;
   status: string;
   summary: BackendScanSummary;
+  scanned_files?: number;
+  source_type?: string;
+  uploaded_file_name?: string;
+  repo_url?: string;
 };
 
 export type BackendScanListResponse = {

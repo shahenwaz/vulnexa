@@ -1,8 +1,10 @@
 import type {
   BackendFinding,
+  BackendScanListItem,
   BackendScanResult,
 } from "@/lib/api/backend-types";
 import type { ScanFinding, ScanResult, Severity } from "@/lib/types";
+import type { ScanStatus } from "@/components/scan/scan-status-badge";
 
 function mapBackendSeverityToUiSeverity(
   severity: BackendFinding["severity"],
@@ -39,7 +41,12 @@ function getRepoNameFromUrl(repoUrl: string): string {
   return cleaned.split("/").pop() ?? repoUrl;
 }
 
-function getScanDisplayName(scan: BackendScanResult): string {
+export function getBackendScanDisplayName(
+  scan: Pick<
+    BackendScanResult | BackendScanListItem,
+    "repo_url" | "uploaded_file_name" | "target"
+  >,
+): string {
   if (scan.repo_url) {
     return getRepoNameFromUrl(scan.repo_url);
   }
@@ -51,6 +58,28 @@ function getScanDisplayName(scan: BackendScanResult): string {
   return getLastPathSegment(scan.target);
 }
 
+export function getHighestSeverityFromSummary(
+  summary: BackendScanResult["summary"] | BackendScanListItem["summary"],
+): Severity {
+  if (summary.critical > 0) return "critical";
+  if (summary.high > 0) return "high";
+  if (summary.medium > 0) return "medium";
+  return "low";
+}
+
+export function mapBackendStatusToUiStatus(status: string): ScanStatus {
+  switch (status) {
+    case "queued":
+      return "queued";
+    case "running":
+      return "running";
+    case "completed":
+      return "completed";
+    default:
+      return "completed";
+  }
+}
+
 export function mapBackendScanResultToUiScanResult(
   scan: BackendScanResult,
 ): ScanResult {
@@ -58,7 +87,7 @@ export function mapBackendScanResultToUiScanResult(
 
   return {
     scanId: scan.scan_id,
-    projectName: getScanDisplayName(scan),
+    projectName: getBackendScanDisplayName(scan),
     scannedAt: new Date().toISOString(),
     totalFiles: scan.scanned_files,
     totalFindings: scan.summary.total_findings,

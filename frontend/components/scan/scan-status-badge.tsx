@@ -1,24 +1,29 @@
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import type { ScanRunStatus } from "@/lib/types";
 
-type ScanStatus = "completed" | "queued" | "draft";
+export type ScanStatus = Exclude<ScanRunStatus, "draft">;
 
-const statusClassMap: Record<ScanStatus, string> = {
+const statusStyles: Record<ScanStatus, string> = {
+  queued: "border-border/60 bg-muted/40 text-muted-foreground",
+  running: "border-primary/20 bg-primary/10 text-primary",
   completed: "border-emerald-500/20 bg-emerald-500/10 text-emerald-300",
-  queued: "border-amber-500/20 bg-amber-500/10 text-amber-300",
-  draft: "border-slate-500/20 bg-slate-500/10 text-slate-300",
+};
+
+const statusLabels: Record<ScanStatus, string> = {
+  queued: "Queued",
+  running: "Running",
+  completed: "Completed",
 };
 
 export function ScanStatusBadge({ status }: { status: ScanStatus }) {
   return (
-    <Badge
-      variant="outline"
+    <span
       className={cn(
-        "capitalize border px-2.5 py-1 text-xs font-medium",
-        statusClassMap[status],
+        "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium tracking-wide",
+        statusStyles[status],
       )}
     >
-      {status}
-    </Badge>
+      {statusLabels[status]}
+    </span>
   );
 }
