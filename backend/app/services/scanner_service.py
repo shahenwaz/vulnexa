@@ -1,8 +1,12 @@
 """Service for scanning source files for simple insecure code patterns."""
 
 from pathlib import Path
-from typing import TypedDict
+from typing import Literal, TypedDict
+
 from app.services.cwe_service import get_cwe_summary
+
+
+Severity = Literal["critical", "high", "medium", "low"]
 
 
 class Rule(TypedDict):
@@ -11,6 +15,7 @@ class Rule(TypedDict):
     name: str
     pattern: str
     cwe_id: str
+    severity: Severity
 
 
 class CweSummary(TypedDict):
@@ -24,20 +29,35 @@ class CweSummary(TypedDict):
 class Finding(TypedDict):
     """A single scan result."""
 
+    id: str
+    title: str
+    severity: Severity
     file: str
     line: int
     matched_text: str
-    rule_name: str
     cwe_id: str
-    cwe_details: CweSummary
+    cwe_name: str
+    description: str
+
+
+class Summary(TypedDict):
+    """Summary counts for a completed scan."""
+
+    total_findings: int
+    critical: int
+    high: int
+    medium: int
+    low: int
 
 
 class ScanResult(TypedDict, total=False):
     """The result returned by the directory scanner."""
 
     error: str
-    total_findings: int
-    scanned_files: int
+    scan_id: str
+    target: str
+    status: str
+    summary: Summary
     findings: list[Finding]
 
 
@@ -46,21 +66,25 @@ RULES: list[Rule] = [
         "name": "Potential eval usage",
         "pattern": "eval(",
         "cwe_id": "CWE-95",
+        "severity": "high",
     },
     {
         "name": "Potential exec usage",
         "pattern": "exec(",
         "cwe_id": "CWE-95",
+        "severity": "high",
     },
     {
         "name": "Possible hardcoded password",
         "pattern": "password =",
         "cwe_id": "CWE-798",
+        "severity": "critical",
     },
     {
         "name": "Possible SQL string query",
         "pattern": "SELECT * FROM",
         "cwe_id": "CWE-89",
+        "severity": "high",
     },
 ]
 
@@ -76,16 +100,34 @@ IGNORED_DIRS = {
 }
 
 
+def build_summary(findings: list[Finding]) -> Summary:
+    """Build severity counts from findings."""
+    summary: Summary = {
+        "total_findings": len(findings),
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+    }
+
+    for finding in findings:
+        severity = finding["severity"]
+        summary[severity] += 1
+
+    return summary
+
+
 def scan_directory(directory_path: str) -> ScanResult:
     """Scan a directory recursively for files matching predefined security rules."""
     findings: list[Finding] = []
-    scanned_files = 0
     cwe_cache: dict[str, CweSummary] = {}
 
     root = Path(directory_path)
 
     if not root.exists() or not root.is_dir():
         return {"error": "Directory not found"}
+
+    finding_counter = 1
 
     for file_path in root.rglob("*"):
         if not file_path.is_file():
@@ -96,8 +138,6 @@ def scan_directory(directory_path: str) -> ScanResult:
 
         if file_path.suffix.lower() not in ALLOWED_EXTENSIONS:
             continue
-
-        scanned_files += 1
 
         try:
             content = file_path.read_text(encoding="utf-8", errors="ignore")
@@ -112,19 +152,27 @@ def scan_directory(directory_path: str) -> ScanResult:
                     if cwe_id not in cwe_cache:
                         cwe_cache[cwe_id] = get_cwe_summary(cwe_id)
 
+                    cwe_details = cwe_cache[cwe_id]
+
                     findings.append(
                         {
+                            "id": f"finding-{finding_counter:03}",
+                            "title": rule["name"],
+                            "severity": rule["severity"],
                             "file": str(file_path),
                             "line": line_number,
                             "matched_text": line.strip(),
-                            "rule_name": rule["name"],
                             "cwe_id": cwe_id,
-                            "cwe_details": cwe_cache[cwe_id],
+                            "cwe_name": cwe_details["name"],
+                            "description": cwe_details["description"],
                         }
                     )
+                    finding_counter += 1
 
     return {
-        "total_findings": len(findings),
-        "scanned_files": scanned_files,
+        "scan_id": "scan-001",
+        "target": str(root),
+        "status": "completed",
+        "summary": build_summary(findings),
         "findings": findings,
     }
