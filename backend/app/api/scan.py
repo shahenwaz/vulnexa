@@ -34,10 +34,12 @@ def scan_local_directory(payload: ScanRequest):
     """Scan a local directory and save the result as JSON."""
     scan_result = scan_directory(payload.directory_path)
 
-    if "error" not in scan_result:
-        saved_to = save_scan_result(scan_result)
-        scan_result["saved_to"] = saved_to
-        scan_result["source_type"] = "local_directory"
+    if "error" in scan_result:
+        raise HTTPException(status_code=400, detail=scan_result["error"])
+
+    saved_to = save_scan_result(scan_result)
+    scan_result["saved_to"] = saved_to
+    scan_result["source_type"] = "local_directory"
 
     return scan_result
 
