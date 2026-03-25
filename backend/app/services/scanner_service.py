@@ -64,6 +64,7 @@ class ScanResult(TypedDict, total=False):
     saved_to: str
     source_type: str
     uploaded_file_name: str
+    repo_url: str
 
 
 RULES: list[Rule] = [

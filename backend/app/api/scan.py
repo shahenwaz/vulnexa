@@ -1,10 +1,11 @@
-"""Routes for local scan operations."""
+"""Routes for scan operations."""
 
 from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
+from app.services.repo_service import download_github_repo_zip
 from app.services.scanner_service import scan_directory
 from app.services.storage_service import (
     list_scan_results,
@@ -22,6 +23,12 @@ class ScanRequest(BaseModel):
     directory_path: str
 
 
+class RepoScanRequest(BaseModel):
+    """Request body for repository URL scanning."""
+
+    repo_url: str
+
+
 @router.post("/local")
 def scan_local_directory(payload: ScanRequest):
     """Scan a local directory and save the result as JSON."""
@@ -30,6 +37,7 @@ def scan_local_directory(payload: ScanRequest):
     if "error" not in scan_result:
         saved_to = save_scan_result(scan_result)
         scan_result["saved_to"] = saved_to
+        scan_result["source_type"] = "local_directory"
 
     return scan_result
 
@@ -71,12 +79,39 @@ async def scan_uploaded_zip(file: UploadFile = File(...)):
             delete_path(extracted_path)
 
 
+@router.post("/repo")
+def scan_github_repo(payload: RepoScanRequest):
+    """Download a public GitHub repo as ZIP, scan it, and save the result."""
+    temp_zip_path = create_temp_zip_path("repo-download.zip")
+    extracted_path = ""
+
+    try:
+        repo_name = download_github_repo_zip(payload.repo_url, temp_zip_path)
+        extracted_path = extract_zip_file(temp_zip_path, repo_name)
+
+        scan_result = scan_directory(extracted_path)
+
+        if "error" not in scan_result:
+            saved_to = save_scan_result(scan_result)
+            scan_result["saved_to"] = saved_to
+            scan_result["source_type"] = "repo_url"
+            scan_result["repo_url"] = payload.repo_url
+
+        return scan_result
+
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    finally:
+        delete_path(str(temp_zip_path))
+        if extracted_path:
+            delete_path(extracted_path)
+
+
 @router.get("")
 def get_saved_scans():
     """Return a list of previously saved scans."""
-    return {
-        "scans": list_scan_results()
-    }
+    return {"scans": list_scan_results()}
 
 
 @router.get("/{scan_id}")

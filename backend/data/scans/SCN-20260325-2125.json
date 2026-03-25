@@ -1,0 +1,234 @@
+{
+  "scan_id": "SCN-20260325-2125",
+  "target": "data\\uploads\\Vulnerable-Flask-App-master",
+  "status": "completed",
+  "summary": {
+    "total_findings": 20,
+    "critical": 8,
+    "high": 12,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "finding-001",
+      "title": "Possible hardcoded password",
+      "severity": "critical",
+      "file": "Vulnerable-Flask-App-master-main/app/app.py",
+      "line": 36,
+      "matched_text": "password = db.Column(db.String(80), unique = True)",
+      "cwe_id": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key."
+    },
+    {
+      "id": "finding-002",
+      "title": "Possible hardcoded password",
+      "severity": "critical",
+      "file": "Vulnerable-Flask-App-master-main/app/app.py",
+      "line": 49,
+      "matched_text": "password = db.Column(db.String(150))",
+      "cwe_id": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key."
+    },
+    {
+      "id": "finding-003",
+      "title": "Possible hardcoded password",
+      "severity": "critical",
+      "file": "Vulnerable-Flask-App-master-main/app/app.py",
+      "line": 63,
+      "matched_text": "user.password = 'admin123'",
+      "cwe_id": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key."
+    },
+    {
+      "id": "finding-004",
+      "title": "Possible hardcoded password",
+      "severity": "critical",
+      "file": "Vulnerable-Flask-App-master-main/app/app.py",
+      "line": 74,
+      "matched_text": "cust.password = str(base64.b64encode(os.urandom(16)))",
+      "cwe_id": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key."
+    },
+    {
+      "id": "finding-005",
+      "title": "Possible hardcoded password",
+      "severity": "critical",
+      "file": "Vulnerable-Flask-App-master-main/app/app.py",
+      "line": 140,
+      "matched_text": "password = content['password']",
+      "cwe_id": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key."
+    },
+    {
+      "id": "finding-006",
+      "title": "Possible hardcoded password",
+      "severity": "critical",
+      "file": "Vulnerable-Flask-App-master-main/app/app.py",
+      "line": 156,
+      "matched_text": "password = content['password']",
+      "cwe_id": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key."
+    },
+    {
+      "id": "finding-007",
+      "title": "Possible hardcoded password",
+      "severity": "critical",
+      "file": "Vulnerable-Flask-App-master-main/app/app.py",
+      "line": 181,
+      "matched_text": "password = content['password']",
+      "cwe_id": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key."
+    },
+    {
+      "id": "finding-008",
+      "title": "Possible hardcoded password",
+      "severity": "critical",
+      "file": "Vulnerable-Flask-App-master-main/app/app.py",
+      "line": 182,
+      "matched_text": "auth_user = User.query.filter_by(username = username, password = password).first()",
+      "cwe_id": "CWE-798",
+      "cwe_name": "Use of Hard-coded Credentials",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key."
+    },
+    {
+      "id": "finding-009",
+      "title": "Potential eval usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 23,
+      "matched_text": "null;for(g=0;g<d.length;g++)if(b=d[g]){var l=f.Qd[b]||{},m=K.$g(l.lang||\"es3\");\"goog\"==l.module||m?K.ck(K.La+b,\"goog\"==l.module,m):K.Gd(K.La+b)}else throw K.na=h,Error(\"Undefined script input\");K.na=h},K.Bd=function(b){return b in K.la.Ub?K.la.Ub[b]:null},K.zj(),K.global.Dm||K.Gd(K.La+\"deps.js\"));K.Ed=null;K.Ml=function(){if(null==K.Ed){try{var b=!eval('\"use strict\";let x = 1; function f() { return typeof x; };f() == \"number\";')}catch(c){b=!1}K.Ed=b}return K.Ed};",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-010",
+      "title": "Potential eval usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 24,
+      "matched_text": "K.Tl=function(b){return\"(function(){\"+b+\"\\n;})();\\n\"};K.fs=function(b){var c=K.na;try{K.na={Wd:void 0,ld:!1};if(K.za(b))var d=b.call(void 0,{});else if(K.L(b))K.Ml()&&(b=K.Tl(b)),d=K.Ck.call(void 0,b);else throw Error(\"Invalid module definition\");var e=K.na.Wd;if(!K.L(e)||!e)throw Error('Invalid module name \"'+e+'\"');K.na.ld?K.tf(e,d):K.vi&&Object.seal&&typeof d==y&&null!=d&&Object.seal(d);K.Fk[e]=d}finally{K.na=c}};K.Ck=function(b){eval(b);return{}};",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-011",
+      "title": "Potential eval usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 26,
+      "matched_text": "K.Rt=function(b,c){var d=K.global.$jscomp;d||(K.global.$jscomp=d={});var e=d.je;if(!e){var f=K.La+K.Bi,g=K.zk(f);if(g){eval(g+a+f);if(K.global.$gwtExport&&K.global.$gwtExport.$jscomp&&!K.global.$gwtExport.$jscomp.transpile)throw Error('The transpiler did not properly export the \"transpile\" method. $gwtExport: '+JSON.stringify(K.global.$gwtExport));K.global.$jscomp.je=K.global.$gwtExport.$jscomp.transpile;d=K.global.$jscomp;e=d.je}}if(!e){var h=\" requires transpilation but no transpiler was found.\";",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-012",
+      "title": "Potential eval usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 33,
+      "matched_text": "K.Vj=function(b){if(K.global.execScript)K.global.execScript(b,\"JavaScript\");else if(K.global.eval){if(null==K.oc)if(K.global.eval(\"var _evalTest_ = 1;\"),\"undefined\"!=typeof K.global._evalTest_){try{delete K.global._evalTest_}catch(e){}K.oc=!0}else K.oc=!1;if(K.oc)K.global.eval(b);else{var c=K.global.document,d=c.createElement(p);d.type=C;d.defer=!1;d.appendChild(c.createTextNode(b));c.body.appendChild(d);c.body.removeChild(d)}}else throw Error(\"goog.globalEval not available\");};K.oc=null;",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-013",
+      "title": "Potential eval usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 41,
+      "matched_text": "K.gj=function(){function b(b,c){e?d[b]=!0:c()?d[b]=!1:e=d[b]=!0}function c(b){try{return!!eval(b)}catch(h){return!1}}var d={es3:!1},e=!1,f=K.global.navigator&&K.global.navigator.userAgent?K.global.navigator.userAgent:\"\";b(\"es5\",function(){return c(\"[1,].length==1\")});b(\"es6\",function(){var b=f.match(/Edge\\/(\\d+)(\\.\\d)*/i);return b&&15>Number(b[1])?!1:c('(()=>{\"use strict\";class X{constructor(){if(new.target!=String)throw 1;this.x=42}}let q=Reflect.construct(X,[],String);if(q.x!=42||!(q instanceof String))throw 1;for(const a of[2,3]){if(a==2)continue;function f(z={a}){let a=0;return z.a}{function f(){return 0;}}return f()==3}})()')});",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-014",
+      "title": "Potential exec usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 57,
+      "matched_text": "K.f.Jb=function(b,c){var d=0;b=K.f.trim(String(b)).split(\".\");c=K.f.trim(String(c)).split(\".\");for(var e=Math.max(b.length,c.length),f=0;0==d&&f<e;f++){var g=b[f]||\"\",h=c[f]||\"\";do{g=/(\\d*)(\\D*)(.*)/.exec(g)||[\"\",\"\",\"\",\"\"];h=/(\\d*)(\\D*)(.*)/.exec(h)||[\"\",\"\",\"\",\"\"];if(0==g[0].length&&0==h[0].length)break;d=K.f.fd(0==g[1].length?0:parseInt(g[1],10),0==h[1].length?0:parseInt(h[1],10))||K.f.fd(0==g[2].length,0==h[2].length)||K.f.fd(g[2],h[2]);g=g[3];h=h[3]}while(0==d)}return d};",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-015",
+      "title": "Potential exec usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 105,
+      "matched_text": "K.g.userAgent.A.Sk=function(){return K.f.nf(K.g.userAgent.A.wb(),\"WebKit\")};K.g.userAgent.A.Df=function(b){for(var c=/(\\w[\\w ]+)\\/([^\\s]+)\\s*(?:\\((.*?)\\))?/g,d=[],e;e=c.exec(b);)d.push([e[1],e[2],e[3]||void 0]);return d};K.object={};K.object.is=function(b,c){return b===c?0!==b||1/b===1/c:b!==b&&c!==c};K.object.forEach=function(b,c,d){for(var e in b)c.call(d,b[e],e,b)};K.object.filter=function(b,c,d){var e={},f;for(f in b)c.call(d,b[f],f,b)&&(e[f]=b[f]);return e};K.object.map=function(b,c,d){var e={},f;for(f in b)e[f]=c.call(d,b[f],f,b);return e};K.object.some=function(b,c,d){for(var e in b)if(c.call(d,b[e],e,b))return!0;return!1};K.object.every=function(b,c,d){for(var e in b)if(!c.call(d,b[e],e,b))return!1;return!0};",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-016",
+      "title": "Potential exec usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 116,
+      "matched_text": "K.g.userAgent.v.wa=function(b){return 0<=K.f.Jb(K.g.userAgent.v.Nb(),b)};K.g.userAgent.v.Lj=function(b){var c=/rv: *([\\d\\.]*)/.exec(b);if(c&&c[1])return c[1];c=\"\";var d=/MSIE +([\\d\\.]+)/.exec(b);if(d&&d[1])if(b=/Trident\\/(\\d.\\d)/.exec(b),\"7.0\"==d[1])if(b&&b[1])switch(b[1]){case \"4.0\":c=\"8.0\";break;case \"5.0\":c=\"9.0\";break;case \"6.0\":c=\"10.0\";break;case \"7.0\":c=\"11.0\"}else c=\"7.0\";else c=d[1];return c};K.g.userAgent.U={};K.g.userAgent.U.nk=function(){return K.g.userAgent.A.J(\"Presto\")};K.g.userAgent.U.rk=function(){return K.g.userAgent.A.J(\"Trident\")||K.g.userAgent.A.J(\"MSIE\")};K.g.userAgent.U.Ra=function(){return K.g.userAgent.A.J(\"Edge\")};K.g.userAgent.U.Pg=function(){return K.g.userAgent.A.Sk()&&!K.g.userAgent.U.Ra()};K.g.userAgent.U.ik=function(){return K.g.userAgent.A.J(\"Gecko\")&&!K.g.userAgent.U.Pg()&&!K.g.userAgent.U.rk()&&!K.g.userAgent.U.Ra()};",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-017",
+      "title": "Potential exec usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 117,
+      "matched_text": "K.g.userAgent.U.Nb=function(){var b=K.g.userAgent.A.wb();if(b){b=K.g.userAgent.A.Df(b);var c=K.g.userAgent.U.Jj(b);if(c)return\"Gecko\"==c[0]?K.g.userAgent.U.Tj(b):c[1];b=b[0];var d;if(b&&(d=b[2])&&(d=/Trident\\/([^\\s;]+)/.exec(d)))return d[1]}return\"\"};K.g.userAgent.U.Jj=function(b){if(!K.g.userAgent.U.Ra())return b[1];for(var c=0;c<b.length;c++){var d=b[c];if(\"Edge\"==d[0])return d}};K.g.userAgent.U.wa=function(b){return 0<=K.f.Jb(K.g.userAgent.U.Nb(),b)};",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-018",
+      "title": "Potential exec usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 125,
+      "matched_text": "K.g.userAgent.platform.Nb=function(){var b=K.g.userAgent.A.wb();var c=\"\";K.g.userAgent.platform.Rg()?(c=/Windows (?:NT|Phone) ([0-9.]+)/,c=(b=c.exec(b))?b[1]:\"0.0\"):K.g.userAgent.platform.Hg()?(c=/(?:iPhone|iPod|iPad|CPU)\\s+OS\\s+(\\S+)/,c=(b=c.exec(b))&&b[1].replace(/_/g,\".\")):K.g.userAgent.platform.Lg()?(c=/Mac OS X ([0-9_.]+)/,c=(b=c.exec(b))?b[1].replace(/_/g,\".\"):\"10\"):K.g.userAgent.platform.Bg()?(c=/Android\\s+([^\\);]+)(\\)|;)/,c=(b=c.exec(b))&&b[1]):K.g.userAgent.platform.Dg()&&(c=/(?:CrOS\\s+(?:i686|x86_64)\\s+([0-9.]+))/,",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-019",
+      "title": "Potential exec usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 126,
+      "matched_text": "c=(b=c.exec(b))&&b[1]);return c||\"\"};K.g.userAgent.platform.wa=function(b){return 0<=K.f.Jb(K.g.userAgent.platform.Nb(),b)};K.Ha={};K.Ha.object=function(b,c){return c};K.Ha.ee=function(b){K.Ha.ee[\" \"](b);return b};K.Ha.ee[\" \"]=K.Sa;K.Ha.Rp=function(b,c){try{return K.Ha.ee(b[c]),!0}catch(d){}return!1};K.Ha.cache=function(b,c,d,e){e=e?e(c):c;return Object.prototype.hasOwnProperty.call(b,e)?b[e]:b[e]=d(c)};K.userAgent={};K.userAgent.re=!1;K.userAgent.pe=!1;K.userAgent.qe=!1;K.userAgent.we=!1;K.userAgent.Wc=!1;K.userAgent.ue=!1;K.userAgent.Hh=!1;K.userAgent.Gb=K.userAgent.re||K.userAgent.pe||K.userAgent.qe||K.userAgent.Wc||K.userAgent.we||K.userAgent.ue;K.userAgent.Sj=function(){return K.g.userAgent.A.wb()};K.userAgent.ag=function(){return K.global.navigator||null};K.userAgent.Qe=K.userAgent.Gb?K.userAgent.ue:K.g.userAgent.v.Pd();K.userAgent.Y=K.userAgent.Gb?K.userAgent.re:K.g.userAgent.v.xc();",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    },
+    {
+      "id": "finding-020",
+      "title": "Potential exec usage",
+      "severity": "high",
+      "file": "Vulnerable-Flask-App-master-main/app/static/loader.js",
+      "line": 131,
+      "matched_text": "K.userAgent.Uj=function(){var b=K.userAgent.Sj();if(K.userAgent.$c)return/rv\\:([^\\);]+)(\\)|;)/.exec(b);if(K.userAgent.Fe)return/Edge\\/([\\d\\.]+)/.exec(b);if(K.userAgent.Y)return/\\b(?:MSIE|rv)[: ]([^\\);]+)(\\)|;)/.exec(b);if(K.userAgent.Hb)return/WebKit\\/(\\S+)/.exec(b);if(K.userAgent.Qe)return/(?:Version)[ \\/]?(\\S+)/.exec(b)};K.userAgent.Rf=function(){var b=K.global.document;return b?b.documentMode:void 0};K.userAgent.VERSION=K.userAgent.qj();K.userAgent.compare=function(b,c){return K.f.Jb(b,c)};",
+      "cwe_id": "CWE-95",
+      "cwe_name": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes code syntax before using the input in a dynamic evaluation call (e.g. \"eval\")."
+    }
+  ]
+}
