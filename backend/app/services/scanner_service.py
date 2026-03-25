@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import TypedDict
+from app.services.cwe_service import get_cwe_summary
 
 
 class Rule(TypedDict):
@@ -12,6 +13,14 @@ class Rule(TypedDict):
     cwe_id: str
 
 
+class CweSummary(TypedDict):
+    """A simplified CWE summary."""
+
+    id: str
+    name: str
+    description: str
+
+
 class Finding(TypedDict):
     """A single scan result."""
 
@@ -20,6 +29,7 @@ class Finding(TypedDict):
     matched_text: str
     rule_name: str
     cwe_id: str
+    cwe_details: CweSummary
 
 
 class ScanResult(TypedDict, total=False):
@@ -70,6 +80,8 @@ def scan_directory(directory_path: str) -> ScanResult:
     """Scan a directory recursively for files matching predefined security rules."""
     findings: list[Finding] = []
     scanned_files = 0
+    cwe_cache: dict[str, CweSummary] = {}
+
     root = Path(directory_path)
 
     if not root.exists() or not root.is_dir():
@@ -95,13 +107,19 @@ def scan_directory(directory_path: str) -> ScanResult:
         for line_number, line in enumerate(content.splitlines(), start=1):
             for rule in RULES:
                 if rule["pattern"] in line:
+                    cwe_id = rule["cwe_id"]
+
+                    if cwe_id not in cwe_cache:
+                        cwe_cache[cwe_id] = get_cwe_summary(cwe_id)
+
                     findings.append(
                         {
                             "file": str(file_path),
                             "line": line_number,
                             "matched_text": line.strip(),
                             "rule_name": rule["name"],
-                            "cwe_id": rule["cwe_id"],
+                            "cwe_id": cwe_id,
+                            "cwe_details": cwe_cache[cwe_id],
                         }
                     )
 
