@@ -30,6 +30,12 @@ export type ScanResult = {
   totalFindings: number;
   severityCounts: Record<Severity, number>;
   findings: ScanFinding[];
+  status?: ScanRunStatus;
+  sourceType?: string;
+  target?: string;
+  savedTo?: string;
+  repoUrl?: string;
+  uploadedFileName?: string;
 };
 
 export type ScanHistoryItem = {
