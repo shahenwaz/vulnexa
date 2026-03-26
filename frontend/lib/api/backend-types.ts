@@ -24,6 +24,7 @@ export type BackendScanResult = {
   scan_id: string;
   target: string;
   status: string;
+  scanned_at?: string;
   summary: BackendScanSummary;
   findings: BackendFinding[];
   scanned_files: number;
@@ -37,6 +38,7 @@ export type BackendScanListItem = {
   scan_id: string;
   target: string;
   status: string;
+  scanned_at?: string;
   summary: BackendScanSummary;
   scanned_files?: number;
   source_type?: string;
