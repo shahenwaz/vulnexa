@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowRight, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 
 import { FindingCard } from "@/components/scan/finding-card";
 import { FindingsFilters } from "@/components/scan/findings-filters";
@@ -56,18 +56,22 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
   return (
     <div className="pb-10">
       <Container className="space-y-6 pt-6 md:space-y-8 md:pt-8">
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
+        <div className="space-y-3">
           <PageIntro
             eyebrow="Scan details"
             title={result.projectName}
-            description={`Detailed review for scan ${result.scanId}. This result is loaded from the saved backend scan output and includes findings, severity distribution, and remediation guidance.`}
+            description="This result is loaded from the saved backend scan output and includes findings, severity distribution, and remediation guidance."
           />
 
-          <div className="flex flex-wrap gap-3 xl:justify-end">
-            <Button asChild className="gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center rounded-md border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+              {result.scanId}
+            </span>
+
+            <Button asChild className="inline-flex items-center gap-2">
               <Link href={`/reports/${result.scanId}`}>
                 <FileText className="size-4" />
-                Open security report
+                Open Report
               </Link>
             </Button>
           </div>
@@ -157,22 +161,6 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
                   </div>
                 ) : null}
               </div>
-            </div>
-
-            <div className="rounded-3xl border border-border/60 bg-card/60 p-6">
-              <h3 className="text-lg font-semibold text-foreground">
-                Next step
-              </h3>
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">
-                Use the report view for a cleaner stakeholder summary and
-                print-friendly export layout.
-              </p>
-              <Button asChild variant="ghost" className="mt-4 gap-2 px-0">
-                <Link href={`/reports/${result.scanId}`}>
-                  Go to report page
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
             </div>
           </div>
 
