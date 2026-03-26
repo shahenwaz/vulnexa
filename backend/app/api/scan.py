@@ -93,11 +93,13 @@ def scan_github_repo(payload: RepoScanRequest):
 
         scan_result = scan_directory(extracted_path)
 
-        if "error" not in scan_result:
-            saved_to = save_scan_result(scan_result)
-            scan_result["saved_to"] = saved_to
-            scan_result["source_type"] = "repo_url"
-            scan_result["repo_url"] = payload.repo_url
+        if "error" in scan_result:
+            raise HTTPException(status_code=400, detail=scan_result["error"])
+
+        saved_to = save_scan_result(scan_result)
+        scan_result["saved_to"] = saved_to
+        scan_result["source_type"] = "repo_url"
+        scan_result["repo_url"] = payload.repo_url
 
         return scan_result
 
