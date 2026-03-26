@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, FileText, FolderGit2 } from "lucide-react";
+import { ArrowUpRight, Clock3, FileText, FolderGit2 } from "lucide-react";
 
 import { ScanStatusBadge } from "@/components/scan/scan-status-badge";
 import { SeverityBadge } from "@/components/scan/severity-badge";
@@ -7,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { BackendScanListItem } from "@/lib/api/backend-types";
 import {
   getBackendScanDisplayName,
+  getBackendSourceLabel,
   getHighestSeverityFromSummary,
   mapBackendStatusToUiStatus,
 } from "@/lib/api/backend-mappers";
+import { formatScanDate } from "@/lib/format";
 
 type RecentScansPanelProps = {
   scans: BackendScanListItem[];
@@ -22,7 +24,7 @@ export function RecentScansPanel({ scans }: RecentScansPanelProps) {
         <div className="space-y-1">
           <CardTitle className="text-lg font-semibold">Recent scans</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Saved scans and their latest result summaries.
+            Saved scans and their latest backend scan summaries.
           </p>
         </div>
 
@@ -74,6 +76,15 @@ export function RecentScansPanel({ scans }: RecentScansPanelProps) {
                   </span>
 
                   <span>{scan.summary.total_findings} findings</span>
+
+                  <span>{getBackendSourceLabel(scan)}</span>
+
+                  {scan.scanned_at ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Clock3 className="size-4" />
+                      {formatScanDate(scan.scanned_at)}
+                    </span>
+                  ) : null}
                 </div>
               </div>
 
