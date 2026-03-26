@@ -55,7 +55,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
 
   return (
     <div className="pb-10">
-      <Container className="space-y-6 pt-6 md:space-y-8 md:pt-8">
+      <Container className="space-y-5 pt-5 md:space-y-8 md:pt-8">
         <div className="space-y-3">
           <PageIntro
             eyebrow="Scan details"
@@ -63,12 +63,12 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
             description="This result is loaded from the saved backend scan output and includes findings, severity distribution, and remediation guidance."
           />
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <span className="inline-flex items-center rounded-md border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
               {result.scanId}
             </span>
 
-            <Button asChild className="inline-flex items-center gap-2">
+            <Button asChild size="sm" className="gap-2">
               <Link href={`/reports/${result.scanId}`}>
                 <FileText className="size-4" />
                 Open Report
@@ -78,9 +78,9 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="space-y-4">
-            <div className="panel-glow rounded-3xl border border-border/60 bg-card/70 p-6">
-              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0 space-y-4">
+            <div className="panel-glow rounded-3xl border border-border/60 bg-card/70 p-4 sm:p-5 md:p-6">
+              <div className="flex flex-col gap-5">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <SeverityBadge severity={highestSeverity} />
@@ -89,7 +89,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
                     </span>
                   </div>
 
-                  <div className="max-w-2xl text-sm leading-7 text-muted-foreground">
+                  <div className="text-sm leading-7 text-muted-foreground">
                     {result.totalFindings} findings detected across{" "}
                     {result.totalFiles} files. {openFindings} finding
                     {openFindings === 1 ? " is" : "s are"} currently open and
@@ -97,7 +97,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
                   </div>
                 </div>
 
-                <div className="grid w-full gap-3 sm:grid-cols-3 md:w-auto">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   <ScanSummaryCard
                     label="Total findings"
                     value={String(result.totalFindings)}
@@ -164,7 +164,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
             </div>
           </div>
 
-          <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <div className="min-w-0 space-y-4 lg:sticky lg:top-24 lg:self-start">
             <ScanMetadataPanel result={result} />
             <RemediationPanel result={result} />
           </div>
