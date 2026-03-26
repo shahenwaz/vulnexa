@@ -37,9 +37,11 @@ def scan_local_directory(payload: ScanRequest):
     if "error" in scan_result:
         raise HTTPException(status_code=400, detail=scan_result["error"])
 
+    scan_result["source_type"] = "local_directory"
+    scan_result["target"] = payload.directory_path
+
     saved_to = save_scan_result(scan_result)
     scan_result["saved_to"] = saved_to
-    scan_result["source_type"] = "local_directory"
 
     return scan_result
 
@@ -96,10 +98,12 @@ def scan_github_repo(payload: RepoScanRequest):
         if "error" in scan_result:
             raise HTTPException(status_code=400, detail=scan_result["error"])
 
-        saved_to = save_scan_result(scan_result)
-        scan_result["saved_to"] = saved_to
         scan_result["source_type"] = "repo_url"
         scan_result["repo_url"] = payload.repo_url
+        scan_result["target"] = payload.repo_url
+
+        saved_to = save_scan_result(scan_result)
+        scan_result["saved_to"] = saved_to
 
         return scan_result
 
