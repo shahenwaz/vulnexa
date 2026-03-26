@@ -32,7 +32,6 @@ function getSummaryTone(
     case "medium":
       return severity;
     case "low":
-    case "info":
       return "default";
     default:
       return fallback;

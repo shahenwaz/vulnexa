@@ -134,7 +134,6 @@ export function mapBackendScanResultToUiScanResult(
       high: scan.summary.high,
       medium: scan.summary.medium,
       low: scan.summary.low,
-      info: 0,
     },
     findings,
     status: mapBackendStatusToUiRunStatus(scan.status),
