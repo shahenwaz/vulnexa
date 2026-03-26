@@ -7,103 +7,132 @@ import {
   AlertCircle,
   ArrowRight,
   CheckCircle2,
+  FolderGit2,
   LayoutDashboard,
+  Loader2,
+  LaptopMinimal,
 } from "lucide-react";
 
-import { createBackendScanFromSession } from "@/lib/api/create-backend-scan";
-import { ScanConfigurationForm } from "@/components/scan/scan-configuration-form";
-import { ScanReadinessPanel } from "@/components/scan/scan-readiness-panel";
-import { ScanSessionPreview } from "@/components/scan/scan-session-preview";
+import { createLocalScan, createRepoScan } from "@/lib/api/scan-service";
 import { Container } from "@/components/shared/container";
 import { PageIntro } from "@/components/shared/page-intro";
 import { Button } from "@/components/ui/button";
-import { getDefaultScanSessionPreset } from "@/lib/scan-session";
-import { getSessionLinks } from "@/lib/scan-session-links";
-import {
-  getScanRunStatusDescription,
-  getScanRunStatusDuration,
-} from "@/lib/scan-session-status";
-import type { ScanSessionPreset } from "@/lib/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+
+type ScanTargetType = "repository" | "folder";
+type SubmitStatus = "idle" | "submitting" | "completed";
+
+function normalizeRepoUrl(value: string): string {
+  const trimmed = value.trim();
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  return `https://${trimmed}`;
+}
+
+function getDisplayName(
+  targetType: ScanTargetType,
+  targetValue: string,
+): string {
+  const trimmed = targetValue.trim();
+
+  if (!trimmed) {
+    return targetType === "repository"
+      ? "Repository scan"
+      : "Local folder scan";
+  }
+
+  if (targetType === "repository") {
+    const cleaned = trimmed.replace(/\/$/, "");
+    return cleaned.split("/").pop() || trimmed;
+  }
+
+  return trimmed.split(/[\\/]/).filter(Boolean).pop() || trimmed;
+}
+
+function getActionLabel(
+  targetType: ScanTargetType,
+  status: SubmitStatus,
+  hasValue: boolean,
+): string {
+  if (status === "submitting") {
+    return targetType === "repository"
+      ? "Scanning repository..."
+      : "Scanning folder...";
+  }
+
+  if (status === "completed") {
+    return "Scan completed";
+  }
+
+  if (!hasValue) {
+    return targetType === "repository"
+      ? "Paste repository URL"
+      : "Enter folder path";
+  }
+
+  return targetType === "repository"
+    ? "Start repository scan"
+    : "Start folder scan";
+}
 
 export default function NewScanPage() {
   const router = useRouter();
 
-  const [session, setSession] = useState<ScanSessionPreset>(
-    getDefaultScanSessionPreset(),
-  );
-  const [resolvedScanId, setResolvedScanId] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [targetType, setTargetType] = useState<ScanTargetType>("repository");
+  const [targetValue, setTargetValue] = useState("");
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [createdScanId, setCreatedScanId] = useState<string | null>(null);
 
-  const sessionLinks = useMemo(
-    () => getSessionLinks(session, resolvedScanId),
-    [session, resolvedScanId],
+  const trimmedTargetValue = targetValue.trim();
+  const hasValue = trimmedTargetValue.length > 0;
+
+  const previewName = useMemo(
+    () => getDisplayName(targetType, trimmedTargetValue),
+    [targetType, trimmedTargetValue],
   );
+
+  const actionLabel = getActionLabel(targetType, submitStatus, hasValue);
 
   async function handleStartScan() {
-    if (isSubmitting) {
+    if (!hasValue || submitStatus === "submitting") {
       return;
     }
 
-    setIsSubmitting(true);
     setSubmitError(null);
+    setSubmitStatus("submitting");
 
     try {
-      setSession((current) => ({
-        ...current,
-        status: "queued",
-        estimatedDuration: getScanRunStatusDuration("queued"),
-        description: getScanRunStatusDescription("queued"),
-      }));
+      const created =
+        targetType === "repository"
+          ? await createRepoScan(normalizeRepoUrl(trimmedTargetValue))
+          : await createLocalScan(trimmedTargetValue);
 
-      const created = await createBackendScanFromSession(session);
-
-      setResolvedScanId(created.scan_id);
-
-      setSession((current) => ({
-        ...current,
-        status: "completed",
-        estimatedDuration: getScanRunStatusDuration("completed"),
-        description: "Backend scan completed and results are ready to review.",
-        projectName: current.projectName || created.scan_id,
-      }));
+      setCreatedScanId(created.scan_id);
+      setSubmitStatus("completed");
 
       router.push(`/scans/${created.scan_id}`);
     } catch (error) {
-      const message =
+      setSubmitStatus("idle");
+      setSubmitError(
         error instanceof Error
           ? error.message
-          : "Failed to create scan. Please try again.";
-
-      setSubmitError(message);
-
-      setSession((current) => ({
-        ...current,
-        status: "draft",
-        estimatedDuration: getScanRunStatusDuration("draft"),
-        description: "Update the scan settings and try again.",
-      }));
-    } finally {
-      setIsSubmitting(false);
+          : "Failed to create scan. Please try again.",
+      );
     }
   }
 
-  function handleResetSession() {
-    setSession(getDefaultScanSessionPreset());
-    setResolvedScanId(null);
+  function handleReset() {
+    setTargetValue("");
     setSubmitError(null);
+    setSubmitStatus("idle");
+    setCreatedScanId(null);
   }
-
-  function handleJumpToCompleted() {
-    setSession((current) => ({
-      ...current,
-      status: "completed",
-      estimatedDuration: getScanRunStatusDuration("completed"),
-      description: getScanRunStatusDescription("completed"),
-    }));
-  }
-
-  const isCompleted = session.status === "completed";
 
   return (
     <div className="pb-10">
@@ -112,7 +141,7 @@ export default function NewScanPage() {
           <PageIntro
             eyebrow="New scan"
             title="Start a new security scan"
-            description="Submit a real scan request to the backend and move directly into the saved scan results."
+            description="Choose a target, submit the scan, and move straight into the saved result."
           />
 
           <div className="flex flex-wrap gap-3 xl:justify-end">
@@ -126,9 +155,9 @@ export default function NewScanPage() {
         </div>
 
         {submitError ? (
-          <div className="rounded-3xl border border-destructive/25 bg-destructive/10 p-5 text-sm text-destructive md:p-6">
+          <div className="rounded-3xl border border-destructive/25 bg-destructive/10 p-5 md:p-6">
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-2xl bg-destructive/15">
+              <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-2xl bg-destructive/15 text-destructive">
                 <AlertCircle className="size-5" />
               </div>
 
@@ -136,13 +165,15 @@ export default function NewScanPage() {
                 <h2 className="text-base font-semibold text-foreground">
                   Scan could not be created
                 </h2>
-                <p className="leading-6 text-muted-foreground">{submitError}</p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {submitError}
+                </p>
               </div>
             </div>
           </div>
         ) : null}
 
-        {isCompleted && resolvedScanId ? (
+        {submitStatus === "completed" && createdScanId ? (
           <div className="panel-glow rounded-3xl border border-primary/20 bg-primary/8 p-5 md:p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-start gap-3">
@@ -156,11 +187,11 @@ export default function NewScanPage() {
                   </h2>
                   <p className="text-sm leading-6 text-muted-foreground">
                     <span className="font-medium text-foreground">
-                      {session.projectName}
+                      {previewName}
                     </span>{" "}
-                    is now linked to result ID{" "}
+                    is ready to review under scan ID{" "}
                     <span className="font-medium text-foreground">
-                      {sessionLinks.scanId}
+                      {createdScanId}
                     </span>
                     .
                   </p>
@@ -169,14 +200,14 @@ export default function NewScanPage() {
 
               <div className="flex flex-wrap gap-3 lg:justify-end">
                 <Button asChild className="gap-2">
-                  <Link href={sessionLinks.scanHref}>
+                  <Link href={`/scans/${createdScanId}`}>
                     View scan
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
 
                 <Button asChild variant="outline" className="gap-2">
-                  <Link href={sessionLinks.reportHref}>
+                  <Link href={`/reports/${createdScanId}`}>
                     Open report
                     <ArrowRight className="size-4" />
                   </Link>
@@ -186,22 +217,171 @@ export default function NewScanPage() {
           </div>
         ) : null}
 
-        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.2fr)_380px]">
-          <div className="self-start">
-            <ScanConfigurationForm
-              value={session}
-              onChange={setSession}
-              onStartScan={handleStartScan}
-              onJumpToCompleted={handleJumpToCompleted}
-              onReset={handleResetSession}
-              isSubmitting={isSubmitting}
-            />
-          </div>
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.2fr)_360px]">
+          <Card className="border-border/60 bg-card/70">
+            <CardHeader className="space-y-4">
+              <div className="space-y-1">
+                <CardTitle className="text-lg">Scan target</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Select the target type and submit it to the backend.
+                </p>
+              </div>
 
-          <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
-            <ScanSessionPreview preset={session} />
-            <ScanReadinessPanel />
-          </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTargetType("repository");
+                    setSubmitError(null);
+                    setSubmitStatus("idle");
+                  }}
+                  className={cn(
+                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
+                    targetType === "repository"
+                      ? "border-primary/40 bg-primary/10 text-foreground"
+                      : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/40",
+                  )}
+                >
+                  <div className="rounded-xl border bg-background/70 p-2">
+                    <FolderGit2 className="size-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">GitHub repository</p>
+                    <p className="text-xs text-muted-foreground">
+                      Paste a public repository URL
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTargetType("folder");
+                    setSubmitError(null);
+                    setSubmitStatus("idle");
+                  }}
+                  className={cn(
+                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
+                    targetType === "folder"
+                      ? "border-primary/40 bg-primary/10 text-foreground"
+                      : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/40",
+                  )}
+                >
+                  <div className="rounded-xl border bg-background/70 p-2">
+                    <LaptopMinimal className="size-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Local folder</p>
+                    <p className="text-xs text-muted-foreground">
+                      Enter a directory path on the backend machine
+                    </p>
+                  </div>
+                </button>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  {targetType === "repository"
+                    ? "Repository URL"
+                    : "Folder path"}
+                </label>
+                <Input
+                  value={targetValue}
+                  onChange={(event) => {
+                    setTargetValue(event.target.value);
+                    setSubmitError(null);
+                    if (submitStatus !== "idle") {
+                      setSubmitStatus("idle");
+                    }
+                  }}
+                  placeholder={
+                    targetType === "repository"
+                      ? "https://github.com/owner/repository"
+                      : "C:\\projects\\my-app"
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  {targetType === "repository"
+                    ? "Use a public GitHub repository link."
+                    : "This path must exist on the machine running the Python backend."}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={handleStartScan}
+                  disabled={!hasValue || submitStatus === "submitting"}
+                  className="gap-2"
+                >
+                  {submitStatus === "submitting" ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : null}
+                  {actionLabel}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleReset}
+                  disabled={submitStatus === "submitting"}
+                >
+                  Reset
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60 bg-card/70 xl:sticky xl:top-24">
+            <CardHeader>
+              <CardTitle className="text-lg">Live preview</CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-4 text-sm">
+              <div className="rounded-2xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Project
+                </p>
+                <p className="mt-1 font-medium text-foreground">
+                  {previewName}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Target type
+                </p>
+                <p className="mt-1 font-medium text-foreground">
+                  {targetType === "repository"
+                    ? "GitHub repository"
+                    : "Local folder"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Current target
+                </p>
+                <p className="mt-1 break-all font-medium text-foreground">
+                  {trimmedTargetValue || "Waiting for input"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Scan state
+                </p>
+                <p className="mt-1 font-medium text-foreground">
+                  {submitStatus === "idle"
+                    ? "Ready"
+                    : submitStatus === "submitting"
+                      ? "Submitting to backend"
+                      : "Completed"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </Container>
     </div>
