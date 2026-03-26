@@ -60,7 +60,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
           <PageIntro
             eyebrow="Scan details"
             title={result.projectName}
-            description={`Detailed review for scan ${result.scanId}. This view focuses on findings, severity distribution, and practical remediation guidance.`}
+            description={`Detailed review for scan ${result.scanId}. This result is loaded from the saved backend scan output and includes findings, severity distribution, and remediation guidance.`}
           />
 
           <div className="flex flex-wrap gap-3 xl:justify-end">
@@ -152,7 +152,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
                     </h3>
                     <p className="mt-2 text-sm text-muted-foreground">
                       There are no findings for the selected severity filter in
-                      this prototype dataset.
+                      this saved scan result.
                     </p>
                   </div>
                 ) : null}

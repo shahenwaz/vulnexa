@@ -63,4 +63,5 @@ def list_scan_results() -> list[dict[str, Any]]:
                 }
             )
 
+    scans.sort(key=lambda scan: scan.get("scanned_at", ""), reverse=True)
     return scans
