@@ -282,7 +282,7 @@ export default function NewScanPage() {
 
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
+                <label className="text-sm font-medium text-foreground mb-2 block">
                   {targetType === "repository"
                     ? "Repository URL"
                     : "Folder path"}

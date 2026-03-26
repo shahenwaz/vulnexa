@@ -27,14 +27,6 @@ export function RecentScansPanel({ scans }: RecentScansPanelProps) {
             Saved scans and their latest backend scan summaries.
           </p>
         </div>
-
-        <Link
-          href="/scans/new"
-          className="inline-flex items-center gap-2 text-sm font-medium text-primary transition hover:text-primary/80"
-        >
-          New scan
-          <ArrowUpRight className="size-4" />
-        </Link>
       </CardHeader>
 
       <CardContent className="space-y-4">

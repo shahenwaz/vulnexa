@@ -138,7 +138,7 @@ export function ScanMetadataPanel({ result }: ScanMetadataPanelProps) {
           </div>
         ) : null}
 
-        {result.target ? (
+        {result.target && result.sourceType !== "repo_url" ? (
           <div className="flex items-start gap-3 rounded-2xl border p-4">
             <div className="rounded-2xl border bg-background/70 p-2">
               <HardDrive className="size-4 text-muted-foreground" />
@@ -163,7 +163,7 @@ export function ScanMetadataPanel({ result }: ScanMetadataPanelProps) {
 
             <div className="min-w-0 flex-1">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                Repository URL
+                Repository
               </p>
               <p className="mt-1 break-all text-sm font-medium text-foreground">
                 {result.repoUrl}
