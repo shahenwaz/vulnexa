@@ -3,7 +3,12 @@ import type {
   BackendScanListItem,
   BackendScanResult,
 } from "@/lib/api/backend-types";
-import type { ScanFinding, ScanResult, Severity } from "@/lib/types";
+import type {
+  ScanFinding,
+  ScanResult,
+  Severity,
+  ScanRunStatus,
+} from "@/lib/types";
 import type { ScanStatus } from "@/components/scan/scan-status-badge";
 
 function mapBackendSeverityToUiSeverity(
@@ -80,6 +85,39 @@ export function mapBackendStatusToUiStatus(status: string): ScanStatus {
   }
 }
 
+export function mapBackendStatusToUiRunStatus(status: string): ScanRunStatus {
+  switch (status) {
+    case "queued":
+      return "queued";
+    case "running":
+      return "running";
+    case "completed":
+      return "completed";
+    default:
+      return "completed";
+  }
+}
+
+export function getBackendSourceLabel(
+  scan: Pick<
+    BackendScanResult | BackendScanListItem,
+    "source_type" | "repo_url" | "uploaded_file_name"
+  >,
+): string {
+  switch (scan.source_type) {
+    case "repo_url":
+      return "GitHub repository";
+    case "zip_upload":
+      return "ZIP upload";
+    case "local_directory":
+      return "Local directory";
+    default:
+      if (scan.repo_url) return "GitHub repository";
+      if (scan.uploaded_file_name) return "ZIP upload";
+      return "Local directory";
+  }
+}
+
 export function mapBackendScanResultToUiScanResult(
   scan: BackendScanResult,
 ): ScanResult {
@@ -88,7 +126,7 @@ export function mapBackendScanResultToUiScanResult(
   return {
     scanId: scan.scan_id,
     projectName: getBackendScanDisplayName(scan),
-    scannedAt: new Date().toISOString(),
+    scannedAt: scan.scanned_at ?? new Date().toISOString(),
     totalFiles: scan.scanned_files,
     totalFindings: scan.summary.total_findings,
     severityCounts: {
@@ -99,5 +137,11 @@ export function mapBackendScanResultToUiScanResult(
       info: 0,
     },
     findings,
+    status: mapBackendStatusToUiRunStatus(scan.status),
+    sourceType: scan.source_type,
+    target: scan.target,
+    savedTo: scan.saved_to,
+    repoUrl: scan.repo_url,
+    uploadedFileName: scan.uploaded_file_name,
   };
 }
