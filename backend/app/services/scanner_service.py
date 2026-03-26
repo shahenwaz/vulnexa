@@ -59,6 +59,7 @@ class ScanResult(TypedDict, total=False):
     scan_id: str
     target: str
     status: str
+    scanned_at: str
     summary: Summary
     findings: list[Finding]
     scanned_files: int
@@ -190,6 +191,7 @@ def scan_directory(directory_path: str) -> ScanResult:
         "scan_id": generate_scan_id(),
         "target": str(root),
         "status": "completed",
+        "scanned_at": datetime.now().isoformat(),
         "summary": build_summary(findings),
         "findings": findings,
         "scanned_files": scanned_files,
