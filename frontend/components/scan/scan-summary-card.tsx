@@ -1,20 +1,19 @@
 import { cn } from "@/lib/utils";
 
+type ScanSummaryTone = "default" | "critical" | "high" | "medium" | "muted";
+
 type ScanSummaryCardProps = {
   label: string;
   value: string;
-  tone?: "default" | "critical" | "high" | "medium" | "muted";
+  tone?: ScanSummaryTone;
 };
 
-const toneClassMap: Record<
-  NonNullable<ScanSummaryCardProps["tone"]>,
-  string
-> = {
-  default: "border-border/70 bg-card/70",
-  critical: "border-red-500/20 bg-red-500/10",
-  high: "border-orange-500/20 bg-orange-500/10",
-  medium: "border-amber-500/20 bg-amber-500/10",
-  muted: "border-border/70 bg-card/70",
+const toneClasses: Record<ScanSummaryTone, string> = {
+  default: "border-border/60 bg-background/40",
+  critical: "border-red-500/30 bg-red-500/10",
+  high: "border-orange-500/30 bg-orange-500/10",
+  medium: "border-amber-500/30 bg-amber-500/10",
+  muted: "border-border/50 bg-background/25",
 };
 
 export function ScanSummaryCard({
@@ -24,16 +23,14 @@ export function ScanSummaryCard({
 }: ScanSummaryCardProps) {
   return (
     <div
-      className={cn(
-        "min-w-0 rounded-2xl border px-3 py-3 sm:px-4 sm:py-3.5 lg:min-h-27",
-        toneClassMap[tone],
-      )}
+      className={cn("min-w-0 rounded-2xl border p-3 sm:p-4", toneClasses[tone])}
     >
-      <p className="text-[10px] font-medium uppercase leading-4 tracking-[0.12em] text-muted-foreground sm:text-[11px]">
-        {label}
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px]">
+        <span className="line-clamp-2 block min-h-[2.1rem] leading-4">
+          {label}
+        </span>
       </p>
-
-      <p className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+      <p className="mt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
         {value}
       </p>
     </div>
