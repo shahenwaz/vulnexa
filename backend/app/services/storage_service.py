@@ -54,6 +54,7 @@ def list_scan_results() -> list[dict[str, Any]]:
                     "scan_id": scan["scan_id"],
                     "target": scan["target"],
                     "status": scan["status"],
+                    "scanned_at": scan.get("scanned_at"),
                     "summary": scan["summary"],
                     "scanned_files": scan.get("scanned_files", 0),
                     "source_type": scan.get("source_type"),
