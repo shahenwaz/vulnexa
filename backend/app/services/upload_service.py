@@ -14,6 +14,16 @@ def ensure_upload_dir() -> None:
     UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
 
 
+def is_safe_zip_member(member_name: str) -> bool:
+    """Return True if a ZIP member path stays inside the extract directory."""
+    member_path = Path(member_name)
+
+    if member_path.is_absolute():
+        return False
+
+    return ".." not in member_path.parts
+
+
 def extract_zip_file(zip_file_path: Path, extract_name: str) -> str:
     """Extract a ZIP file into a dedicated folder and return that folder path."""
     ensure_upload_dir()
@@ -26,6 +36,12 @@ def extract_zip_file(zip_file_path: Path, extract_name: str) -> str:
     extract_path.mkdir(parents=True, exist_ok=True)
 
     with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
+        for member in zip_ref.infolist():
+            if not is_safe_zip_member(member.filename):
+                raise ValueError(
+                    f"Unsafe ZIP entry detected: {member.filename}"
+                )
+
         zip_ref.extractall(extract_path)
 
     return str(extract_path)

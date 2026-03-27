@@ -7,6 +7,34 @@ import type {
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 
+function getReadableScanError(message: string): string {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("only zip files are supported")) {
+    return "Please upload a valid ZIP file.";
+  }
+
+  if (
+    normalized.includes("uploaded zip is too large") ||
+    normalized.includes("maximum size is")
+  ) {
+    return "This ZIP file is too large. Please upload a smaller archive.";
+  }
+
+  if (
+    normalized.includes("unsafe zip entry detected") ||
+    normalized.includes("unsafe zip")
+  ) {
+    return "This ZIP file contains unsafe paths and cannot be scanned.";
+  }
+
+  if (normalized.includes("missing file name")) {
+    return "The selected file could not be read properly. Please choose it again.";
+  }
+
+  return message;
+}
+
 async function fetchJson<T>(input: string, init?: RequestInit): Promise<T> {
   const response = await fetch(input, {
     ...init,
@@ -21,15 +49,37 @@ async function fetchJson<T>(input: string, init?: RequestInit): Promise<T> {
     let message = `Request failed with status ${response.status}`;
 
     try {
-      const errorBody = (await response.json()) as {
-        detail?: string;
-      };
-
+      const errorBody = (await response.json()) as { detail?: string };
       if (errorBody?.detail) {
-        message = errorBody.detail;
+        message = getReadableScanError(errorBody.detail);
       }
     } catch {
-      // Keep fallback message
+      // keep fallback
+    }
+
+    throw new Error(message);
+  }
+
+  return response.json() as Promise<T>;
+}
+
+async function fetchFormData<T>(input: string, body: FormData): Promise<T> {
+  const response = await fetch(input, {
+    method: "POST",
+    body,
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let message = `Request failed with status ${response.status}`;
+
+    try {
+      const errorBody = (await response.json()) as { detail?: string };
+      if (errorBody?.detail) {
+        message = getReadableScanError(errorBody.detail);
+      }
+    } catch {
+      // keep fallback
     }
 
     throw new Error(message);
@@ -71,5 +121,15 @@ export async function createLocalScan(
       method: "POST",
       body: JSON.stringify({ directory_path: directoryPath }),
     },
+  );
+}
+
+export async function createUploadScan(file: File): Promise<BackendScanResult> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return fetchFormData<BackendScanResult>(
+    `${BACKEND_BASE_URL}${scanApiEndpoints.createUploadScan}`,
+    formData,
   );
 }

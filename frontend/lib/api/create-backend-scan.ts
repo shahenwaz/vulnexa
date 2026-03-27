@@ -30,7 +30,7 @@ export async function createBackendScanFromSession(
 
     case "upload":
       throw new Error(
-        "ZIP upload is not connected yet in this step. Use repository or local folder for now.",
+        "ZIP upload should be submitted from the upload flow with a File object.",
       );
 
     default:

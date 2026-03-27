@@ -16,6 +16,9 @@ from app.services.upload_service import create_temp_zip_path, delete_path, extra
 
 router = APIRouter(prefix="/scan", tags=["Scan"])
 
+MAX_UPLOAD_SIZE_BYTES = 24 * 1024 * 1024
+UPLOAD_CHUNK_SIZE = 1024 * 1024
+
 
 def normalize_repo_project_key(repo_url: str) -> str:
     return repo_url.strip().rstrip("/").lower()
@@ -23,6 +26,10 @@ def normalize_repo_project_key(repo_url: str) -> str:
 
 def normalize_local_project_key(directory_path: str) -> str:
     return str(Path(directory_path).expanduser().resolve()).lower()
+
+
+def normalize_upload_project_key(filename: str) -> str:
+    return Path(filename).stem.strip().lower()
 
 
 class ScanRequest(BaseModel):
@@ -48,7 +55,8 @@ def scan_local_directory(payload: ScanRequest):
     scan_result["source_type"] = "local_directory"
     scan_result["target"] = payload.directory_path
     scan_result["project_key"] = normalize_local_project_key(
-        payload.directory_path)
+        payload.directory_path
+    )
 
     saved_to = save_scan_result(scan_result)
     scan_result["saved_to"] = saved_to
@@ -64,31 +72,57 @@ async def scan_uploaded_zip(file: UploadFile = File(...)):
 
     if not file.filename.lower().endswith(".zip"):
         raise HTTPException(
-            status_code=400, detail="Only ZIP files are supported")
+            status_code=400,
+            detail="Only ZIP files are supported",
+        )
 
     temp_zip_path = create_temp_zip_path(file.filename)
     extracted_path = ""
 
     try:
+        total_bytes_written = 0
+
         with temp_zip_path.open("wb") as buffer:
-            content = await file.read()
-            buffer.write(content)
+            while True:
+                chunk = await file.read(UPLOAD_CHUNK_SIZE)
+
+                if not chunk:
+                    break
+
+                total_bytes_written += len(chunk)
+
+                if total_bytes_written > MAX_UPLOAD_SIZE_BYTES:
+                    raise HTTPException(
+                        status_code=413,
+                        detail="Uploaded ZIP is too large. Maximum size is 25 MB.",
+                    )
+
+                buffer.write(chunk)
 
         extract_name = Path(file.filename).stem
         extracted_path = extract_zip_file(temp_zip_path, extract_name)
 
         scan_result = scan_directory(extracted_path)
 
-        if "error" not in scan_result:
-            saved_to = save_scan_result(scan_result)
-            scan_result["saved_to"] = saved_to
-            scan_result["source_type"] = "zip_upload"
-            scan_result["uploaded_file_name"] = file.filename
-            scan_result["project_key"] = file.filename.strip().lower()
+        if "error" in scan_result:
+            raise HTTPException(status_code=400, detail=scan_result["error"])
+
+        scan_result["source_type"] = "zip_upload"
+        scan_result["uploaded_file_name"] = file.filename
+        scan_result["project_key"] = normalize_upload_project_key(
+            file.filename)
+        scan_result["target"] = extract_name
+
+        saved_to = save_scan_result(scan_result)
+        scan_result["saved_to"] = saved_to
 
         return scan_result
 
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     finally:
+        await file.close()
         delete_path(str(temp_zip_path))
         if extracted_path:
             delete_path(extracted_path)
@@ -113,7 +147,8 @@ def scan_github_repo(payload: RepoScanRequest):
         scan_result["repo_url"] = payload.repo_url
         scan_result["target"] = payload.repo_url
         scan_result["project_key"] = normalize_repo_project_key(
-            payload.repo_url)
+            payload.repo_url
+        )
 
         saved_to = save_scan_result(scan_result)
         scan_result["saved_to"] = saved_to

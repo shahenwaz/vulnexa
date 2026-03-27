@@ -7,13 +7,19 @@ import {
   AlertCircle,
   ArrowRight,
   CheckCircle2,
+  FileArchive,
   FolderGit2,
   LayoutDashboard,
   Loader2,
   LaptopMinimal,
 } from "lucide-react";
 
-import { createLocalScan, createRepoScan } from "@/lib/api/scan-service";
+import {
+  createLocalScan,
+  createRepoScan,
+  createUploadScan,
+} from "@/lib/api/scan-service";
+import { ZipUploadDropzone } from "@/components/scan/zip-upload-dropzone";
 import { Container } from "@/components/shared/container";
 import { PageIntro } from "@/components/shared/page-intro";
 import { Button } from "@/components/ui/button";
@@ -21,7 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-type ScanTargetType = "repository" | "folder";
+type ScanTargetType = "repository" | "folder" | "upload";
 type SubmitStatus = "idle" | "submitting" | "completed";
 
 function normalizeRepoUrl(value: string): string {
@@ -41,9 +47,9 @@ function getDisplayName(
   const trimmed = targetValue.trim();
 
   if (!trimmed) {
-    return targetType === "repository"
-      ? "Repository scan"
-      : "Local folder scan";
+    if (targetType === "repository") return "Repository scan";
+    if (targetType === "folder") return "Local folder scan";
+    return "ZIP upload scan";
   }
 
   if (targetType === "repository") {
@@ -60,9 +66,9 @@ function getActionLabel(
   hasValue: boolean,
 ): string {
   if (status === "submitting") {
-    return targetType === "repository"
-      ? "Scanning repository..."
-      : "Scanning folder...";
+    if (targetType === "repository") return "Scanning repository...";
+    if (targetType === "folder") return "Scanning folder...";
+    return "Uploading ZIP and scanning...";
   }
 
   if (status === "completed") {
@@ -70,14 +76,14 @@ function getActionLabel(
   }
 
   if (!hasValue) {
-    return targetType === "repository"
-      ? "Paste repository URL"
-      : "Enter folder path";
+    if (targetType === "repository") return "Paste repository URL";
+    if (targetType === "folder") return "Enter folder path";
+    return "Select ZIP file";
   }
 
-  return targetType === "repository"
-    ? "Start repository scan"
-    : "Start folder scan";
+  if (targetType === "repository") return "Start repository scan";
+  if (targetType === "folder") return "Start folder scan";
+  return "Start ZIP scan";
 }
 
 export default function NewScanPage() {
@@ -88,14 +94,22 @@ export default function NewScanPage() {
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [createdScanId, setCreatedScanId] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const trimmedTargetValue = targetValue.trim();
-  const hasValue = trimmedTargetValue.length > 0;
 
-  const previewName = useMemo(
-    () => getDisplayName(targetType, trimmedTargetValue),
-    [targetType, trimmedTargetValue],
-  );
+  const hasValue =
+    targetType === "upload"
+      ? uploadedFile !== null
+      : trimmedTargetValue.length > 0;
+
+  const previewName = useMemo(() => {
+    if (targetType === "upload") {
+      return uploadedFile?.name.replace(/\.zip$/i, "") || "ZIP upload scan";
+    }
+
+    return getDisplayName(targetType, trimmedTargetValue);
+  }, [targetType, trimmedTargetValue, uploadedFile]);
 
   const actionLabel = getActionLabel(targetType, submitStatus, hasValue);
 
@@ -111,7 +125,9 @@ export default function NewScanPage() {
       const created =
         targetType === "repository"
           ? await createRepoScan(normalizeRepoUrl(trimmedTargetValue))
-          : await createLocalScan(trimmedTargetValue);
+          : targetType === "folder"
+            ? await createLocalScan(trimmedTargetValue)
+            : await createUploadScan(uploadedFile as File);
 
       setCreatedScanId(created.scan_id);
       setSubmitStatus("completed");
@@ -132,7 +148,33 @@ export default function NewScanPage() {
     setSubmitError(null);
     setSubmitStatus("idle");
     setCreatedScanId(null);
+    setUploadedFile(null);
   }
+
+  function handleTargetTypeChange(nextType: ScanTargetType) {
+    setTargetType(nextType);
+    setSubmitError(null);
+    setSubmitStatus("idle");
+    setCreatedScanId(null);
+
+    if (nextType === "upload") {
+      setTargetValue("");
+    } else {
+      setUploadedFile(null);
+    }
+  }
+
+  const targetTypeLabel =
+    targetType === "repository"
+      ? "GitHub repository"
+      : targetType === "folder"
+        ? "Local folder"
+        : "ZIP upload";
+
+  const currentTargetText =
+    targetType === "upload"
+      ? uploadedFile?.name || "Waiting for ZIP file"
+      : trimmedTargetValue || "Waiting for input";
 
   return (
     <div className="pb-10">
@@ -163,7 +205,9 @@ export default function NewScanPage() {
 
               <div className="space-y-1">
                 <h2 className="text-base font-semibold text-foreground">
-                  Scan could not be created
+                  {targetType === "upload"
+                    ? "Upload scan could not be created"
+                    : "Scan could not be created"}
                 </h2>
                 <p className="text-sm leading-6 text-muted-foreground">
                   {submitError}
@@ -227,16 +271,12 @@ export default function NewScanPage() {
                 </p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setTargetType("repository");
-                    setSubmitError(null);
-                    setSubmitStatus("idle");
-                  }}
+                  onClick={() => handleTargetTypeChange("repository")}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
+                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition cursor-pointer",
                     targetType === "repository"
                       ? "border-primary/40 bg-primary/10 text-foreground"
                       : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/40",
@@ -255,13 +295,9 @@ export default function NewScanPage() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setTargetType("folder");
-                    setSubmitError(null);
-                    setSubmitStatus("idle");
-                  }}
+                  onClick={() => handleTargetTypeChange("folder")}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
+                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition cursor-pointer",
                     targetType === "folder"
                       ? "border-primary/40 bg-primary/10 text-foreground"
                       : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/40",
@@ -277,35 +313,74 @@ export default function NewScanPage() {
                     </p>
                   </div>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleTargetTypeChange("upload")}
+                  className={cn(
+                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition cursor-pointer",
+                    targetType === "upload"
+                      ? "border-primary/40 bg-primary/10 text-foreground"
+                      : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/40",
+                  )}
+                >
+                  <div className="rounded-xl border bg-background/70 p-2">
+                    <FileArchive className="size-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">ZIP upload</p>
+                    <p className="text-xs text-muted-foreground">
+                      Upload a compressed project archive
+                    </p>
+                  </div>
+                </button>
               </div>
             </CardHeader>
 
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground mb-2 block">
+                <label className="mb-2 block text-sm font-medium text-foreground">
                   {targetType === "repository"
                     ? "Repository URL"
-                    : "Folder path"}
+                    : targetType === "folder"
+                      ? "Folder path"
+                      : "ZIP file"}
                 </label>
-                <Input
-                  value={targetValue}
-                  onChange={(event) => {
-                    setTargetValue(event.target.value);
-                    setSubmitError(null);
-                    if (submitStatus !== "idle") {
+
+                {targetType === "upload" ? (
+                  <ZipUploadDropzone
+                    file={uploadedFile}
+                    onFileSelect={(file) => {
+                      setUploadedFile(file);
+                      setSubmitError(null);
                       setSubmitStatus("idle");
+                    }}
+                    disabled={submitStatus === "submitting"}
+                  />
+                ) : (
+                  <Input
+                    value={targetValue}
+                    onChange={(event) => {
+                      setTargetValue(event.target.value);
+                      setSubmitError(null);
+                      if (submitStatus !== "idle") {
+                        setSubmitStatus("idle");
+                      }
+                    }}
+                    placeholder={
+                      targetType === "repository"
+                        ? "https://github.com/owner/repository"
+                        : "C:\\projects\\my-app"
                     }
-                  }}
-                  placeholder={
-                    targetType === "repository"
-                      ? "https://github.com/owner/repository"
-                      : "C:\\projects\\my-app"
-                  }
-                />
+                  />
+                )}
+
                 <p className="text-xs text-muted-foreground">
                   {targetType === "repository"
                     ? "Use a public GitHub repository link."
-                    : "This path must exist on the machine running the Python backend."}
+                    : targetType === "folder"
+                      ? "This path must exist on the machine running the Python backend."
+                      : "Upload a ZIP archive of the project you want to scan."}
                 </p>
               </div>
 
@@ -354,9 +429,7 @@ export default function NewScanPage() {
                   Target type
                 </p>
                 <p className="mt-1 font-medium text-foreground">
-                  {targetType === "repository"
-                    ? "GitHub repository"
-                    : "Local folder"}
+                  {targetTypeLabel}
                 </p>
               </div>
 
@@ -365,7 +438,7 @@ export default function NewScanPage() {
                   Current target
                 </p>
                 <p className="mt-1 break-all font-medium text-foreground">
-                  {trimmedTargetValue || "Waiting for input"}
+                  {currentTargetText}
                 </p>
               </div>
 

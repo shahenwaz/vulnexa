@@ -1,5 +1,6 @@
 import {
   Clock3,
+  FileArchive,
   FileCode2,
   FolderGit2,
   HardDrive,
@@ -34,7 +35,50 @@ function getMetadataBadgeStatus(status?: ScanResult["status"]): ScanStatus {
   }
 }
 
+function getPrimaryTargetDetails(result: ScanResult): {
+  label: string;
+  value: string;
+  icon: typeof HardDrive;
+} | null {
+  if (result.sourceType === "zip_upload" && result.uploadedFileName) {
+    return {
+      label: "Uploaded file",
+      value: result.uploadedFileName,
+      icon: FileArchive,
+    };
+  }
+
+  if (result.sourceType === "local_directory" && result.target) {
+    return {
+      label: "Target path",
+      value: result.target,
+      icon: HardDrive,
+    };
+  }
+
+  return null;
+}
+
+function getSecondaryTargetDetails(result: ScanResult): {
+  label: string;
+  value: string;
+  icon: typeof HardDrive;
+} | null {
+  if (result.sourceType === "zip_upload" && result.target) {
+    return {
+      label: "Extracted folder",
+      value: result.target,
+      icon: HardDrive,
+    };
+  }
+
+  return null;
+}
+
 export function ScanMetadataPanel({ result }: ScanMetadataPanelProps) {
+  const primaryTargetDetails = getPrimaryTargetDetails(result);
+  const secondaryTargetDetails = getSecondaryTargetDetails(result);
+
   return (
     <Card>
       <CardHeader>
@@ -81,7 +125,7 @@ export function ScanMetadataPanel({ result }: ScanMetadataPanelProps) {
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
               Scanned at
             </p>
-            <p className="mt-1 wrap-break-word text-sm font-medium text-foreground">
+            <p className="mt-1 text-sm font-medium text-foreground">
               {formatScanDate(result.scannedAt)}
             </p>
           </div>
@@ -96,7 +140,7 @@ export function ScanMetadataPanel({ result }: ScanMetadataPanelProps) {
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
               Files scanned
             </p>
-            <p className="mt-1 wrap-break-word text-sm font-medium text-foreground">
+            <p className="mt-1 text-sm font-medium text-foreground">
               {result.totalFiles}
             </p>
           </div>
@@ -138,18 +182,18 @@ export function ScanMetadataPanel({ result }: ScanMetadataPanelProps) {
           </div>
         ) : null}
 
-        {result.target && result.sourceType !== "repo_url" ? (
+        {primaryTargetDetails ? (
           <div className="flex items-start gap-3 rounded-2xl border p-4">
             <div className="rounded-2xl border bg-background/70 p-2">
-              <HardDrive className="size-4 text-muted-foreground" />
+              <primaryTargetDetails.icon className="size-4 text-muted-foreground" />
             </div>
 
             <div className="min-w-0 flex-1">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                Target path
+                {primaryTargetDetails.label}
               </p>
               <p className="mt-1 wrap-break-word text-sm font-medium text-foreground">
-                {result.target}
+                {primaryTargetDetails.value}
               </p>
             </div>
           </div>
@@ -167,6 +211,23 @@ export function ScanMetadataPanel({ result }: ScanMetadataPanelProps) {
               </p>
               <p className="mt-1 break-all text-sm font-medium text-foreground">
                 {result.repoUrl}
+              </p>
+            </div>
+          </div>
+        ) : null}
+
+        {secondaryTargetDetails ? (
+          <div className="flex items-start gap-3 rounded-2xl border p-4">
+            <div className="rounded-2xl border bg-background/70 p-2">
+              <secondaryTargetDetails.icon className="size-4 text-muted-foreground" />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                {secondaryTargetDetails.label}
+              </p>
+              <p className="mt-1 wrap-break-word text-sm text-muted-foreground">
+                {secondaryTargetDetails.value}
               </p>
             </div>
           </div>
