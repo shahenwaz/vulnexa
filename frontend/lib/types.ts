@@ -31,6 +31,7 @@ export type ScanResult = {
   severityCounts: Record<Severity, number>;
   findings: ScanFinding[];
   status?: ScanRunStatus;
+  projectKey?: string;
   sourceType?: string;
   target?: string;
   savedTo?: string;
