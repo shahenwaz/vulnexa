@@ -17,6 +17,14 @@ from app.services.upload_service import create_temp_zip_path, delete_path, extra
 router = APIRouter(prefix="/scan", tags=["Scan"])
 
 
+def normalize_repo_project_key(repo_url: str) -> str:
+    return repo_url.strip().rstrip("/").lower()
+
+
+def normalize_local_project_key(directory_path: str) -> str:
+    return str(Path(directory_path).expanduser().resolve()).lower()
+
+
 class ScanRequest(BaseModel):
     """Request body for local directory scanning."""
 
@@ -39,6 +47,8 @@ def scan_local_directory(payload: ScanRequest):
 
     scan_result["source_type"] = "local_directory"
     scan_result["target"] = payload.directory_path
+    scan_result["project_key"] = normalize_local_project_key(
+        payload.directory_path)
 
     saved_to = save_scan_result(scan_result)
     scan_result["saved_to"] = saved_to
@@ -74,6 +84,7 @@ async def scan_uploaded_zip(file: UploadFile = File(...)):
             scan_result["saved_to"] = saved_to
             scan_result["source_type"] = "zip_upload"
             scan_result["uploaded_file_name"] = file.filename
+            scan_result["project_key"] = file.filename.strip().lower()
 
         return scan_result
 
@@ -101,6 +112,8 @@ def scan_github_repo(payload: RepoScanRequest):
         scan_result["source_type"] = "repo_url"
         scan_result["repo_url"] = payload.repo_url
         scan_result["target"] = payload.repo_url
+        scan_result["project_key"] = normalize_repo_project_key(
+            payload.repo_url)
 
         saved_to = save_scan_result(scan_result)
         scan_result["saved_to"] = saved_to
