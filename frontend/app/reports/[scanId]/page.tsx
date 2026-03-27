@@ -31,7 +31,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   return (
     <Section className="pt-10 md:pt-14 print:pt-0">
-      <Container className="max-w-5xl space-y-6 md:space-y-8 print:max-w-none print:px-0">
+      <Container className="max-w-6xl space-y-6 md:space-y-8 print:max-w-none print:px-0">
         <ReportHeader result={result} />
         <ExecutiveSummary result={result} />
 

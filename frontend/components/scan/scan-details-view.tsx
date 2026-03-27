@@ -163,7 +163,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
             </div>
           </div>
 
-          <div className="min-w-0 space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <div className="min-w-0 space-y-4 lg:self-start">
             <ScanMetadataPanel result={result} />
             <RemediationPanel result={result} />
           </div>
