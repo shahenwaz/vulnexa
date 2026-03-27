@@ -22,6 +22,7 @@ export type BackendScanSummary = {
 
 export type BackendScanResult = {
   scan_id: string;
+  project_key?: string;
   target: string;
   status: string;
   scanned_at?: string;
@@ -36,6 +37,7 @@ export type BackendScanResult = {
 
 export type BackendScanListItem = {
   scan_id: string;
+  project_key?: string;
   target: string;
   status: string;
   scanned_at?: string;
