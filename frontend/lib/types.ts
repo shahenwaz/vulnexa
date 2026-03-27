@@ -1,4 +1,4 @@
-export type Severity = "critical" | "high" | "medium" | "low" | "info";
+export type Severity = "critical" | "high" | "medium" | "low";
 
 export type FindingStatus = "open" | "reviewing" | "resolved";
 
@@ -30,6 +30,13 @@ export type ScanResult = {
   totalFindings: number;
   severityCounts: Record<Severity, number>;
   findings: ScanFinding[];
+  status?: ScanRunStatus;
+  projectKey?: string;
+  sourceType?: string;
+  target?: string;
+  savedTo?: string;
+  repoUrl?: string;
+  uploadedFileName?: string;
 };
 
 export type ScanHistoryItem = {

@@ -13,8 +13,7 @@ const features = [
   },
   {
     title: "Severity-based triage",
-    description:
-      "Separate critical, high, medium, low, and informational findings clearly.",
+    description: "Separate critical, high, medium and low findings clearly.",
     icon: ShieldAlert,
   },
   {

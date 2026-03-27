@@ -1,6 +1,6 @@
 import type { ScanFinding, ScanResult, Severity } from "@/lib/types";
 
-const severityOrder: Severity[] = ["critical", "high", "medium", "low", "info"];
+const severityOrder: Severity[] = ["critical", "high", "medium", "low"];
 
 export function getSeverityOrder() {
   return severityOrder;
@@ -9,7 +9,7 @@ export function getSeverityOrder() {
 export function getHighestSeverity(result: ScanResult): Severity {
   return (
     severityOrder.find((severity) => result.severityCounts[severity] > 0) ??
-    "info"
+    "low"
   );
 }
 

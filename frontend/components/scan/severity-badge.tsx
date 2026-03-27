@@ -7,7 +7,6 @@ const severityClassMap: Record<Severity, string> = {
   high: "badge-high",
   medium: "badge-medium",
   low: "badge-low",
-  info: "badge-info",
 };
 
 export function SeverityBadge({ severity }: { severity: Severity }) {

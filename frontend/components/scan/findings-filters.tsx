@@ -1,36 +1,48 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import type { Severity } from "@/lib/types";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type FindingsFiltersProps = {
   value: Severity | "all";
   onChange: (value: Severity | "all") => void;
 };
 
-const filterItems: Array<{ value: Severity | "all"; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "critical", label: "Critical" },
-  { value: "high", label: "High" },
-  { value: "medium", label: "Medium" },
-  { value: "low", label: "Low" },
-  { value: "info", label: "Info" },
+const filterOptions: Array<{
+  label: string;
+  value: Severity | "all";
+}> = [
+  { label: "All", value: "all" },
+  { label: "Critical", value: "critical" },
+  { label: "High", value: "high" },
+  { label: "Medium", value: "medium" },
+  { label: "Low", value: "low" },
 ];
 
 export function FindingsFilters({ value, onChange }: FindingsFiltersProps) {
   return (
-    <Tabs value={value} onValueChange={(v) => onChange(v as Severity | "all")}>
-      <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 rounded-2xl border border-border/60 bg-background/40 p-2">
-        {filterItems.map((item) => (
-          <TabsTrigger
-            key={item.value}
-            value={item.value}
-            className="h-9 rounded-xl border border-border/60 bg-card/70 px-3 text-xs font-medium whitespace-nowrap data-[state=active]:border-primary/30 data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
-          >
-            {item.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    </Tabs>
+    <div className="overflow-x-auto pb-1">
+      <div className="flex min-w-max items-center gap-1.5 rounded-2xl border border-border/60 bg-card/40 p-1.5 sm:gap-2 sm:p-2">
+        {filterOptions.map((option) => {
+          const isActive = option.value === value;
+
+          return (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onChange(option.value)}
+              className={cn(
+                "inline-flex h-8 items-center rounded-lg border px-2.5 text-xs font-medium whitespace-nowrap transition sm:h-9 sm:px-3 sm:text-sm cursor-pointer",
+                isActive
+                  ? "border-primary/30 bg-primary/10 text-primary"
+                  : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+              )}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }

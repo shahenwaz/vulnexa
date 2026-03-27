@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowRight, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 
 import { FindingCard } from "@/components/scan/finding-card";
 import { FindingsFilters } from "@/components/scan/findings-filters";
@@ -32,7 +32,6 @@ function getSummaryTone(
     case "medium":
       return severity;
     case "low":
-    case "info":
       return "default";
     default:
       return fallback;
@@ -55,28 +54,32 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
 
   return (
     <div className="pb-10">
-      <Container className="space-y-6 pt-6 md:space-y-8 md:pt-8">
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
+      <Container className="space-y-5 pt-5 md:space-y-8 md:pt-8">
+        <div className="space-y-3">
           <PageIntro
             eyebrow="Scan details"
             title={result.projectName}
-            description={`Detailed review for scan ${result.scanId}. This view focuses on findings, severity distribution, and practical remediation guidance.`}
+            description="This result is loaded from the saved backend scan output and includes findings, severity distribution, and remediation guidance."
           />
 
-          <div className="flex flex-wrap gap-3 xl:justify-end">
-            <Button asChild className="gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="inline-flex items-center rounded-md border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+              {result.scanId}
+            </span>
+
+            <Button asChild size="sm" className="gap-2">
               <Link href={`/reports/${result.scanId}`}>
                 <FileText className="size-4" />
-                Open security report
+                Open Report
               </Link>
             </Button>
           </div>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="space-y-4">
-            <div className="panel-glow rounded-3xl border border-border/60 bg-card/70 p-6">
-              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0 space-y-4">
+            <div className="panel-glow rounded-3xl border border-border/60 bg-card/70 p-4 sm:p-5 md:p-6">
+              <div className="flex flex-col gap-5">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <SeverityBadge severity={highestSeverity} />
@@ -85,7 +88,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
                     </span>
                   </div>
 
-                  <div className="max-w-2xl text-sm leading-7 text-muted-foreground">
+                  <div className="text-sm leading-7 text-muted-foreground">
                     {result.totalFindings} findings detected across{" "}
                     {result.totalFiles} files. {openFindings} finding
                     {openFindings === 1 ? " is" : "s are"} currently open and
@@ -93,7 +96,7 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
                   </div>
                 </div>
 
-                <div className="grid w-full gap-3 sm:grid-cols-3 md:w-auto">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   <ScanSummaryCard
                     label="Total findings"
                     value={String(result.totalFindings)}
@@ -152,31 +155,15 @@ export function ScanDetailsView({ result }: ScanDetailsViewProps) {
                     </h3>
                     <p className="mt-2 text-sm text-muted-foreground">
                       There are no findings for the selected severity filter in
-                      this prototype dataset.
+                      this saved scan result.
                     </p>
                   </div>
                 ) : null}
               </div>
             </div>
-
-            <div className="rounded-3xl border border-border/60 bg-card/60 p-6">
-              <h3 className="text-lg font-semibold text-foreground">
-                Next step
-              </h3>
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">
-                Use the report view for a cleaner stakeholder summary and
-                print-friendly export layout.
-              </p>
-              <Button asChild variant="ghost" className="mt-4 gap-2 px-0">
-                <Link href={`/reports/${result.scanId}`}>
-                  Go to report page
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-            </div>
           </div>
 
-          <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <div className="min-w-0 space-y-4 lg:self-start">
             <ScanMetadataPanel result={result} />
             <RemediationPanel result={result} />
           </div>

@@ -34,9 +34,9 @@ export function ReportHeader({ result }: ReportHeaderProps) {
             </h1>
 
             <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
-              Executive scan report prepared for frontend prototype review. This
-              page is structured to support future export and printable report
-              generation.
+              Security scan report generated from the saved backend scan result,
+              including severity breakdown, grouped findings, and remediation
+              guidance.
             </p>
           </div>
         </div>
@@ -45,14 +45,18 @@ export function ReportHeader({ result }: ReportHeaderProps) {
           className="flex flex-wrap items-center gap-3 print:hidden"
           data-print-hidden="true"
         >
-          <Button variant="outline" onClick={() => window.print()}>
+          <Button
+            variant="outline"
+            onClick={() => window.print()}
+            className="cursor-pointer"
+          >
             <Printer className="size-4" />
             Print report
           </Button>
 
-          <Button disabled>
+          <Button className="cursor-pointer" disabled>
             <Download className="size-4" />
-            Export PDF later
+            Download Report
           </Button>
         </div>
       </div>
