@@ -57,6 +57,7 @@ class ScanResult(TypedDict, total=False):
 
     error: str
     scan_id: str
+    project_key: str
     target: str
     status: str
     scanned_at: str
