@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { BackendUnavailableState } from "@/components/shared/backend-unavailable-state";
 import { ExecutiveSummary } from "@/components/reports/executive-summary";
 import { GroupedFindings } from "@/components/reports/grouped-findings";
 import { RemediationSummary } from "@/components/reports/remediation-summary";
@@ -8,7 +9,7 @@ import { SeveritySummaryTable } from "@/components/reports/severity-summary-tabl
 import { Container } from "@/components/shared/container";
 import { Section } from "@/components/shared/section";
 import { mapBackendScanResultToUiScanResult } from "@/lib/api/backend-mappers";
-import { getScanById } from "@/lib/api/scan-service";
+import { getScanById, ScanApiError } from "@/lib/api/scan-service";
 import type { ScanResult } from "@/lib/types";
 
 type ReportPageProps = {
@@ -20,13 +21,27 @@ type ReportPageProps = {
 export default async function ReportPage({ params }: ReportPageProps) {
   const { scanId } = await params;
 
-  let result: ScanResult;
+  let result: ScanResult | null = null;
+  let isBackendUnavailable = false;
 
   try {
     const backendResult = await getScanById(scanId);
     result = mapBackendScanResultToUiScanResult(backendResult);
-  } catch {
-    notFound();
+  } catch (error) {
+    if (error instanceof ScanApiError && error.status === 404) {
+      notFound();
+    }
+
+    isBackendUnavailable = true;
+  }
+
+  if (isBackendUnavailable || !result) {
+    return (
+      <BackendUnavailableState
+        title="Report is unavailable"
+        description="Vulnexa could not load this report from the backend right now. Make sure the backend is running, then try again."
+      />
+    );
   }
 
   return (

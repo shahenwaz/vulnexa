@@ -7,6 +7,16 @@ import type {
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 
+export class ScanApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ScanApiError";
+    this.status = status;
+  }
+}
+
 function getReadableScanError(message: string): string {
   const normalized = message.toLowerCase();
 
@@ -35,15 +45,25 @@ function getReadableScanError(message: string): string {
   return message;
 }
 
+function getBackendUnavailableMessage(): string {
+  return "Unable to reach the backend. Make sure the backend server is running and try again.";
+}
+
 async function fetchJson<T>(input: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(input, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-    cache: "no-store",
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(input, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(init?.headers ?? {}),
+      },
+      cache: "no-store",
+    });
+  } catch {
+    throw new ScanApiError(getBackendUnavailableMessage(), 503);
+  }
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
@@ -57,18 +77,24 @@ async function fetchJson<T>(input: string, init?: RequestInit): Promise<T> {
       // keep fallback
     }
 
-    throw new Error(message);
+    throw new ScanApiError(message, response.status);
   }
 
   return response.json() as Promise<T>;
 }
 
 async function fetchFormData<T>(input: string, body: FormData): Promise<T> {
-  const response = await fetch(input, {
-    method: "POST",
-    body,
-    cache: "no-store",
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(input, {
+      method: "POST",
+      body,
+      cache: "no-store",
+    });
+  } catch {
+    throw new ScanApiError(getBackendUnavailableMessage(), 503);
+  }
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
@@ -82,7 +108,7 @@ async function fetchFormData<T>(input: string, body: FormData): Promise<T> {
       // keep fallback
     }
 
-    throw new Error(message);
+    throw new ScanApiError(message, response.status);
   }
 
   return response.json() as Promise<T>;

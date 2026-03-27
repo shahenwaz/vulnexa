@@ -1,3 +1,4 @@
+import { BackendUnavailableState } from "@/components/shared/backend-unavailable-state";
 import { EmptyStatePanel } from "@/components/dashboard/empty-state-panel";
 import { QuickActionsPanel } from "@/components/dashboard/quick-actions-panel";
 import { RecentScansPanel } from "@/components/dashboard/recent-scans-panel";
@@ -5,9 +6,27 @@ import { Container } from "@/components/shared/container";
 import { PageIntro } from "@/components/shared/page-intro";
 import { Section } from "@/components/shared/section";
 import { getSavedScans } from "@/lib/api/scan-service";
+import type { BackendScanListResponse } from "@/lib/api/backend-types";
 
 export default async function DashboardPage() {
-  const { scans } = await getSavedScans();
+  let data: BackendScanListResponse | null = null;
+
+  try {
+    data = await getSavedScans();
+  } catch {
+    data = null;
+  }
+
+  if (!data) {
+    return (
+      <BackendUnavailableState
+        title="Dashboard is temporarily unavailable"
+        description="Vulnexa could not load saved scans from the backend. Make sure the backend server is running, then refresh and try again."
+      />
+    );
+  }
+
+  const { scans } = data;
 
   return (
     <Section className="pt-10 md:pt-14">
