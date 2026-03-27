@@ -52,6 +52,7 @@ def list_scan_results() -> list[dict[str, Any]]:
             scans.append(
                 {
                     "scan_id": scan["scan_id"],
+                    "project_key": scan.get("project_key"),
                     "target": scan["target"],
                     "status": scan["status"],
                     "scanned_at": scan.get("scanned_at"),
