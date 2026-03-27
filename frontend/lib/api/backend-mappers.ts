@@ -137,6 +137,7 @@ export function mapBackendScanResultToUiScanResult(
     },
     findings,
     status: mapBackendStatusToUiRunStatus(scan.status),
+    projectKey: scan.project_key,
     sourceType: scan.source_type,
     target: scan.target,
     savedTo: scan.saved_to,

@@ -313,7 +313,7 @@ export default function NewScanPage() {
                 <Button
                   onClick={handleStartScan}
                   disabled={!hasValue || submitStatus === "submitting"}
-                  className="gap-2"
+                  className="gap-2 cursor-pointer"
                 >
                   {submitStatus === "submitting" ? (
                     <Loader2 className="size-4 animate-spin" />
@@ -326,6 +326,7 @@ export default function NewScanPage() {
                   variant="outline"
                   onClick={handleReset}
                   disabled={submitStatus === "submitting"}
+                  className="cursor-pointer"
                 >
                   Reset
                 </Button>

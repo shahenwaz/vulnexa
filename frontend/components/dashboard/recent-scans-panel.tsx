@@ -20,6 +20,7 @@ import {
   mapBackendStatusToUiStatus,
 } from "@/lib/api/backend-mappers";
 import { formatScanDate } from "@/lib/format";
+import { getScanRunDisplayNames } from "@/lib/scan-runs";
 
 type RecentScansPanelProps = {
   scans: BackendScanListItem[];
@@ -38,6 +39,8 @@ function getSourceIcon(scan: BackendScanListItem) {
 }
 
 export function RecentScansPanel({ scans }: RecentScansPanelProps) {
+  const scanDisplayNames = getScanRunDisplayNames(scans);
+
   return (
     <Card className="border-border/60 bg-card/70">
       <CardHeader className="flex flex-row items-start justify-between space-y-0">
@@ -81,7 +84,8 @@ export function RecentScansPanel({ scans }: RecentScansPanelProps) {
 
                   <div className="space-y-1">
                     <h3 className="truncate text-base font-semibold text-foreground">
-                      {getBackendScanDisplayName(scan)}
+                      {scanDisplayNames.get(scan.scan_id) ??
+                        getBackendScanDisplayName(scan)}
                     </h3>
                     <p className="text-xs text-muted-foreground">
                       {scan.scan_id}
