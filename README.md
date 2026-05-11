@@ -1,17 +1,15 @@
 # Vulnexa
 
-![Status](https://img.shields.io/badge/status-active%20development-2563eb)
+![Status](https://img.shields.io/badge/status-final%20submission-2563eb)
 ![Frontend](https://img.shields.io/badge/frontend-Next.js-111827)
 ![Backend](https://img.shields.io/badge/backend-FastAPI-059669)
 ![License](https://img.shields.io/badge/license-MIT-f59e0b)
 
-Vulnexa is an open-source smart vulnerability assessment tool for web applications. It helps users scan codebases, review security findings, understand severity levels, and move from detection to clearer remediation and reporting.
+Vulnexa is an open-source smart vulnerability assessment and business risk reporting tool for web applications. It helps users scan codebases, review security findings, understand severity levels, and generate reports that explain both technical issues and business-level impact.
 
-This project is being developed as a final-year university major project with a focus on practical security workflows, clean product design, and understandable reporting.
+This project was developed as a final-year university major project with a focus on practical security workflows, clean product design, understandable remediation guidance, and management-friendly reporting.
 
 ## Features
-
-### Current
 
 - Modern dashboard for recent scans and quick actions
 - Scan support for:
@@ -20,21 +18,21 @@ This project is being developed as a final-year university major project with a 
   - uploaded ZIP archives
 - Saved scan results with backend-driven history
 - Scan details view with grouped findings and metadata
-- Report page with executive summary, severity breakdown, findings, and remediation summary
+- Report page with:
+  - executive summary
+  - business-level risk translation
+  - severity breakdown
+  - grouped findings
+  - remediation guidance per finding
+- Business report profile selection for:
+  - Standard company
+  - Finance company
 - CWE enrichment for findings using MITRE lookup data
+- Improved rule-based detection to reduce simple false positives
 - Stable project keys for repeated scan tracking
 - Run numbering for repeated scans in dashboard history
 - Friendly validation and backend-unavailable states
 - Responsive UI for desktop and mobile use
-
-### Planned
-
-- richer vulnerability detection coverage
-- comparison between previous and latest runs
-- clearer tracking of fixed, reduced, and unchanged findings
-- improved report export and sharing flow
-- future AI-assisted security insights
-- optional local LLM support for privacy-focused analysis
 
 ## Tech Stack
 
@@ -66,9 +64,11 @@ vulnexa/
 
 ## Current Status
 
-Vulnexa is in active development.
+Vulnexa is ready for final project submission.
 
-The project now includes a connected frontend and backend flow for creating scans, saving results, loading recent history, and viewing real scan and report data. Current work is focused on improving scan depth, expanding comparison features, and polishing the overall workflow.
+The project includes a connected frontend and backend flow for creating scans, saving results, loading recent history, viewing scan details, and generating security reports. The final version also includes business-level reporting, where technical findings are translated into management-friendly impact explanations.
+
+AI-assisted reporting was considered during the project but left as future work to keep the final implementation stable, reproducible, and easier to evaluate.
 
 ## Requirements
 
@@ -196,6 +196,32 @@ From there, you can start a scan using:
 - a local folder path
 - a ZIP file upload
 
+## Running a Business Report Test
+
+A simple test sample can be placed in:
+
+```text
+test-samples/business-report-scan-sample/security-test-sample.ts
+```
+
+Example test content:
+
+```ts
+const PASSWORD_LABEL = "Password";
+const adminPassword = process.env.ADMIN_PASSWORD;
+const password = "admin12345";
+const query = "SELECT * FROM users";
+```
+
+Expected behaviour:
+
+- `PASSWORD_LABEL` should not be detected
+- `process.env.ADMIN_PASSWORD` should not be detected as a hardcoded secret
+- `password = "admin12345"` should be detected as a critical hardcoded secret
+- `SELECT * FROM users` should be detected as a high severity SQL query pattern
+
+Run the same scan once with **Standard company** and once with **Finance company**. The technical findings should remain the same, but the business-level report wording should change based on the selected profile.
+
 ## Important Notes for Running Scans
 
 ### Local folder scans
@@ -263,6 +289,16 @@ Usually this means one of these:
 - wrong backend URL in `.env.local`
 - CORS or dependency issue from an incomplete backend setup
 
+### Next.js Turbopack root warning
+
+If Next.js detects multiple lockfiles, make sure the frontend is being run from:
+
+```text
+vulnexa/frontend
+```
+
+If needed, set the Turbopack root in `frontend/next.config.ts` so the frontend resolves dependencies from the correct folder.
+
 ## Suggested Development Workflow
 
 1. start the backend first
@@ -274,9 +310,20 @@ Usually this means one of these:
 
 - Build a professional security project with real-world value
 - Make security findings easier to understand and review
+- Translate technical issues into business-level impact
 - Present risks and remediation in a cleaner, more useful way
 - Create a strong final-year project and portfolio piece
 - Keep the platform practical for students, developers, and small teams
+
+## Future Work
+
+- Expand vulnerability detection coverage
+- Add comparison between previous and latest scans
+- Improve tracking of fixed, reduced, and unchanged findings
+- Add more business report profiles
+- Improve report export and sharing flow
+- Explore optional AI-assisted security insights
+- Explore optional local LLM support for privacy-focused analysis
 
 ## License
 
