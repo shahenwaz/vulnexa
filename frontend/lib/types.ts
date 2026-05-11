@@ -6,6 +6,18 @@ export type ScanRunStatus = "draft" | "queued" | "running" | "completed";
 
 export type ScanTargetType = "repository" | "upload" | "folder";
 
+export type BusinessProfile = "standard" | "finance";
+
+export type BusinessReport = {
+  profile: BusinessProfile;
+  profileLabel: string;
+  riskLevel: string;
+  executiveSummary: string;
+  businessImpact: string[];
+  customerImpact: string[];
+  priorityRecommendation: string[];
+};
+
 export type ScanFinding = {
   id: string;
   ruleId?: string;
@@ -37,6 +49,8 @@ export type ScanResult = {
   savedTo?: string;
   repoUrl?: string;
   uploadedFileName?: string;
+  businessProfile?: BusinessProfile;
+  businessReport?: BusinessReport;
 };
 
 export type ScanHistoryItem = {

@@ -1,15 +1,16 @@
+import type { ScanStatus } from "@/components/scan/scan-status-badge";
 import type {
   BackendFinding,
   BackendScanListItem,
   BackendScanResult,
 } from "@/lib/api/backend-types";
 import type {
+  BusinessReport,
   ScanFinding,
   ScanResult,
   Severity,
   ScanRunStatus,
 } from "@/lib/types";
-import type { ScanStatus } from "@/components/scan/scan-status-badge";
 
 function mapBackendSeverityToUiSeverity(
   severity: BackendFinding["severity"],
@@ -118,6 +119,22 @@ export function getBackendSourceLabel(
   }
 }
 
+function mapBackendBusinessReportToUiReport(
+  report: BackendScanResult["business_report"],
+): BusinessReport | undefined {
+  if (!report) return undefined;
+
+  return {
+    profile: report.profile,
+    profileLabel: report.profile_label,
+    riskLevel: report.risk_level,
+    executiveSummary: report.executive_summary,
+    businessImpact: report.business_impact,
+    customerImpact: report.customer_impact,
+    priorityRecommendation: report.priority_recommendation,
+  };
+}
+
 export function mapBackendScanResultToUiScanResult(
   scan: BackendScanResult,
 ): ScanResult {
@@ -143,5 +160,7 @@ export function mapBackendScanResultToUiScanResult(
     savedTo: scan.saved_to,
     repoUrl: scan.repo_url,
     uploadedFileName: scan.uploaded_file_name,
+    businessProfile: scan.business_profile,
+    businessReport: mapBackendBusinessReportToUiReport(scan.business_report),
   };
 }

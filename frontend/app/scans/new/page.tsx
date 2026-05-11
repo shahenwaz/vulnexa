@@ -25,6 +25,7 @@ import { PageIntro } from "@/components/shared/page-intro";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { BusinessProfile } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type ScanTargetType = "repository" | "folder" | "upload";
@@ -86,10 +87,16 @@ function getActionLabel(
   return "Start ZIP scan";
 }
 
+function getBusinessProfileLabel(profile: BusinessProfile): string {
+  return profile === "finance" ? "Finance company" : "Standard company";
+}
+
 export default function NewScanPage() {
   const router = useRouter();
 
   const [targetType, setTargetType] = useState<ScanTargetType>("repository");
+  const [businessProfile, setBusinessProfile] =
+    useState<BusinessProfile>("standard");
   const [targetValue, setTargetValue] = useState("");
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -124,10 +131,13 @@ export default function NewScanPage() {
     try {
       const created =
         targetType === "repository"
-          ? await createRepoScan(normalizeRepoUrl(trimmedTargetValue))
+          ? await createRepoScan(
+              normalizeRepoUrl(trimmedTargetValue),
+              businessProfile,
+            )
           : targetType === "folder"
-            ? await createLocalScan(trimmedTargetValue)
-            : await createUploadScan(uploadedFile as File);
+            ? await createLocalScan(trimmedTargetValue, businessProfile)
+            : await createUploadScan(uploadedFile as File, businessProfile);
 
       setCreatedScanId(created.scan_id);
       setSubmitStatus("completed");
@@ -149,6 +159,7 @@ export default function NewScanPage() {
     setSubmitStatus("idle");
     setCreatedScanId(null);
     setUploadedFile(null);
+    setBusinessProfile("standard");
   }
 
   function handleTargetTypeChange(nextType: ScanTargetType) {
@@ -276,7 +287,7 @@ export default function NewScanPage() {
                   type="button"
                   onClick={() => handleTargetTypeChange("repository")}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition cursor-pointer",
+                    "flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
                     targetType === "repository"
                       ? "border-primary/40 bg-primary/10 text-foreground"
                       : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/40",
@@ -297,7 +308,7 @@ export default function NewScanPage() {
                   type="button"
                   onClick={() => handleTargetTypeChange("folder")}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition cursor-pointer",
+                    "flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
                     targetType === "folder"
                       ? "border-primary/40 bg-primary/10 text-foreground"
                       : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/40",
@@ -318,7 +329,7 @@ export default function NewScanPage() {
                   type="button"
                   onClick={() => handleTargetTypeChange("upload")}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition cursor-pointer",
+                    "flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
                     targetType === "upload"
                       ? "border-primary/40 bg-primary/10 text-foreground"
                       : "border-border/60 bg-background/40 text-muted-foreground hover:bg-accent/40",
@@ -384,11 +395,33 @@ export default function NewScanPage() {
                 </p>
               </div>
 
+              <div className="space-y-2">
+                <label className="mb-2 block text-sm font-medium text-foreground">
+                  Business report profile
+                </label>
+
+                <select
+                  value={businessProfile}
+                  onChange={(event) =>
+                    setBusinessProfile(event.target.value as BusinessProfile)
+                  }
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                >
+                  <option value="standard">Standard company</option>
+                  <option value="finance">Finance company</option>
+                </select>
+
+                <p className="text-xs text-muted-foreground">
+                  This changes the management report wording and business impact
+                  explanation.
+                </p>
+              </div>
+
               <div className="flex flex-wrap gap-3">
                 <Button
                   onClick={handleStartScan}
                   disabled={!hasValue || submitStatus === "submitting"}
-                  className="gap-2 cursor-pointer"
+                  className="cursor-pointer gap-2"
                 >
                   {submitStatus === "submitting" ? (
                     <Loader2 className="size-4 animate-spin" />
@@ -430,6 +463,15 @@ export default function NewScanPage() {
                 </p>
                 <p className="mt-1 font-medium text-foreground">
                   {targetTypeLabel}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Business profile
+                </p>
+                <p className="mt-1 font-medium text-foreground">
+                  {getBusinessProfileLabel(businessProfile)}
                 </p>
               </div>
 

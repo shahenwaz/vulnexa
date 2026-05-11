@@ -22,7 +22,10 @@ export function SeveritySummaryTable({ result }: SeveritySummaryTableProps) {
   return (
     <Card className="print:break-inside-avoid">
       <CardHeader>
-        <CardTitle className="text-xl">Severity table</CardTitle>
+        <CardTitle className="text-xl">Severity breakdown</CardTitle>
+        <p className="text-sm leading-6 text-muted-foreground">
+          A compact view of finding distribution used for testing and evaluation.
+        </p>
       </CardHeader>
 
       <CardContent>

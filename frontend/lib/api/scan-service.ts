@@ -3,6 +3,7 @@ import type {
   BackendScanListResponse,
   BackendScanResult,
 } from "@/lib/api/backend-types";
+import type { BusinessProfile } from "@/lib/types";
 
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
@@ -128,31 +129,43 @@ export async function getScanById(scanId: string): Promise<BackendScanResult> {
 
 export async function createRepoScan(
   repoUrl: string,
+  businessProfile: BusinessProfile = "standard",
 ): Promise<BackendScanResult> {
   return fetchJson<BackendScanResult>(
     `${BACKEND_BASE_URL}${scanApiEndpoints.createRepoScan}`,
     {
       method: "POST",
-      body: JSON.stringify({ repo_url: repoUrl }),
+      body: JSON.stringify({
+        repo_url: repoUrl,
+        business_profile: businessProfile,
+      }),
     },
   );
 }
 
 export async function createLocalScan(
   directoryPath: string,
+  businessProfile: BusinessProfile = "standard",
 ): Promise<BackendScanResult> {
   return fetchJson<BackendScanResult>(
     `${BACKEND_BASE_URL}${scanApiEndpoints.createLocalScan}`,
     {
       method: "POST",
-      body: JSON.stringify({ directory_path: directoryPath }),
+      body: JSON.stringify({
+        directory_path: directoryPath,
+        business_profile: businessProfile,
+      }),
     },
   );
 }
 
-export async function createUploadScan(file: File): Promise<BackendScanResult> {
+export async function createUploadScan(
+  file: File,
+  businessProfile: BusinessProfile = "standard",
+): Promise<BackendScanResult> {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("business_profile", businessProfile);
 
   return fetchFormData<BackendScanResult>(
     `${BACKEND_BASE_URL}${scanApiEndpoints.createUploadScan}`,
