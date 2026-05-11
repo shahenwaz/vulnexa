@@ -1,4 +1,3 @@
-import { FindingStatusBadge } from "@/components/scan/finding-status-badge";
 import { SeverityBadge } from "@/components/scan/severity-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { groupFindingsBySeverity } from "@/lib/report";
@@ -17,9 +16,20 @@ export function GroupedFindings({ result }: GroupedFindingsProps) {
     <Card>
       <CardHeader>
         <CardTitle className="text-xl">Grouped findings</CardTitle>
+        <p className="text-sm leading-6 text-muted-foreground">
+          Technical evidence for the report, grouped by severity. Each finding
+          includes its location, CWE reference, matched code, and remediation
+          guidance.
+        </p>
       </CardHeader>
 
       <CardContent className="space-y-8">
+        {groups.length === 0 ? (
+          <div className="rounded-2xl border p-5 text-sm leading-6 text-muted-foreground">
+            No findings were detected by the selected scan rules.
+          </div>
+        ) : null}
+
         {groups.map((group) => (
           <section key={group.severity} className="space-y-4">
             <div className="flex items-center gap-3 border-b pb-3">
@@ -40,13 +50,6 @@ export function GroupedFindings({ result }: GroupedFindingsProps) {
                     <div className="space-y-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <SeverityBadge severity={finding.severity} />
-                        <FindingStatusBadge status={finding.status} />
-
-                        {finding.confidence ? (
-                          <span className="rounded-full border px-2.5 py-1 text-xs text-muted-foreground">
-                            Confidence: {finding.confidence}
-                          </span>
-                        ) : null}
 
                         {finding.cwe ? (
                           <span className="rounded-full border px-2.5 py-1 text-xs text-muted-foreground">
@@ -65,34 +68,17 @@ export function GroupedFindings({ result }: GroupedFindingsProps) {
                         </p>
                       </div>
                     </div>
-
-                    {finding.ruleId ? (
-                      <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                        {finding.ruleId}
-                      </span>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Description</p>
-                      <p className="text-sm leading-7 text-muted-foreground">
-                        {finding.description}
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Impact</p>
-                      <p className="text-sm leading-7 text-muted-foreground">
-                        {finding.impact || "Impact details not provided yet."}
-                      </p>
-                    </div>
                   </div>
 
                   <div className="mt-5 space-y-2">
-                    <p className="text-sm font-medium">
-                      Recommended remediation
+                    <p className="text-sm font-medium">Why this matters</p>
+                    <p className="text-sm leading-7 text-muted-foreground">
+                      {finding.description}
                     </p>
+                  </div>
+
+                  <div className="mt-5 space-y-2">
+                    <p className="text-sm font-medium">Remediation guidance</p>
                     <p className="text-sm leading-7 text-muted-foreground">
                       {finding.remediation}
                     </p>
@@ -103,7 +89,7 @@ export function GroupedFindings({ result }: GroupedFindingsProps) {
                       <p className="text-sm font-medium">
                         Relevant code snippet
                       </p>
-                      <pre className="overflow-x-auto whitespace-pre-wrap wrap-break-words rounded-2xl border bg-background/80 p-4 text-xs leading-6 text-muted-foreground ">
+                      <pre className="overflow-x-auto whitespace-pre-wrap wrap-break-words rounded-2xl border bg-background/80 p-4 text-xs leading-6 text-muted-foreground">
                         <code className="wrap-break-word">
                           {finding.codeSnippet}
                         </code>

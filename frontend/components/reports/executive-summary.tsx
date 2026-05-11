@@ -1,13 +1,8 @@
-import { AlertTriangle, CheckCircle2, Clock3, ShieldAlert } from "lucide-react";
+import { FileCode2, ShieldAlert, TriangleAlert } from "lucide-react";
 
 import { SeverityBadge } from "@/components/scan/severity-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  getHighestSeverity,
-  getOpenFindingsCount,
-  getResolvedFindingsCount,
-  getReviewingFindingsCount,
-} from "@/lib/report";
+import { getHighestSeverity } from "@/lib/report";
 import type { ScanResult } from "@/lib/types";
 
 type ExecutiveSummaryProps = {
@@ -16,33 +11,49 @@ type ExecutiveSummaryProps = {
 
 export function ExecutiveSummary({ result }: ExecutiveSummaryProps) {
   const highestSeverity = getHighestSeverity(result);
-  const openCount = getOpenFindingsCount(result.findings);
-  const reviewingCount = getReviewingFindingsCount(result.findings);
-  const resolvedCount = getResolvedFindingsCount(result.findings);
 
   return (
     <Card className="panel-glow print:break-inside-avoid">
       <CardHeader className="space-y-3">
         <CardTitle className="text-xl">Executive summary</CardTitle>
-        <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-          The current prototype scan found{" "}
-          <span className="font-medium text-foreground">
-            {result.totalFindings} total findings
-          </span>{" "}
-          across{" "}
+        <p className="max-w-4xl text-sm leading-7 text-muted-foreground">
+          Vulnexa analysed{" "}
           <span className="font-medium text-foreground">
             {result.totalFiles}
           </span>{" "}
-          files. The highest detected severity is{" "}
+          file{result.totalFiles === 1 ? "" : "s"} and identified{" "}
+          <span className="font-medium text-foreground">
+            {result.totalFindings}
+          </span>{" "}
+          potential security finding{result.totalFindings === 1 ? "" : "s"}.
+          The highest detected severity is{" "}
           <span className="align-middle">
             <SeverityBadge severity={highestSeverity} />
           </span>
-          . Immediate attention should focus on open critical and high-risk
-          findings before wider remediation and validation work.
+          . The report below translates the technical results into business impact
+          and lists the findings that need remediation.
         </p>
       </CardHeader>
 
-      <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <CardContent className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border p-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <TriangleAlert className="size-4" />
+            Findings
+          </div>
+          <p className="mt-3 text-2xl font-semibold">
+            {result.totalFindings}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border p-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <FileCode2 className="size-4" />
+            Files analysed
+          </div>
+          <p className="mt-3 text-2xl font-semibold">{result.totalFiles}</p>
+        </div>
+
         <div className="rounded-2xl border p-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <ShieldAlert className="size-4" />
@@ -51,30 +62,6 @@ export function ExecutiveSummary({ result }: ExecutiveSummaryProps) {
           <div className="mt-3">
             <SeverityBadge severity={highestSeverity} />
           </div>
-        </div>
-
-        <div className="rounded-2xl border p-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <AlertTriangle className="size-4" />
-            Open findings
-          </div>
-          <p className="mt-3 text-2xl font-semibold">{openCount}</p>
-        </div>
-
-        <div className="rounded-2xl border p-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock3 className="size-4" />
-            Under review
-          </div>
-          <p className="mt-3 text-2xl font-semibold">{reviewingCount}</p>
-        </div>
-
-        <div className="rounded-2xl border p-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CheckCircle2 className="size-4" />
-            Resolved
-          </div>
-          <p className="mt-3 text-2xl font-semibold">{resolvedCount}</p>
         </div>
       </CardContent>
     </Card>

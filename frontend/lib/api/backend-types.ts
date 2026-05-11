@@ -20,6 +20,18 @@ export type BackendScanSummary = {
   low: number;
 };
 
+export type BackendBusinessProfile = "standard" | "finance";
+
+export type BackendBusinessReport = {
+  profile: BackendBusinessProfile;
+  profile_label: string;
+  risk_level: string;
+  executive_summary: string;
+  business_impact: string[];
+  customer_impact: string[];
+  priority_recommendation: string[];
+};
+
 export type BackendScanResult = {
   scan_id: string;
   project_key?: string;
@@ -33,6 +45,8 @@ export type BackendScanResult = {
   source_type?: string;
   uploaded_file_name?: string;
   repo_url?: string;
+  business_profile?: BackendBusinessProfile;
+  business_report?: BackendBusinessReport;
 };
 
 export type BackendScanListItem = {

@@ -2,11 +2,12 @@
 
 from pathlib import Path
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from app.services.repo_service import download_github_repo_zip
 from app.services.scanner_service import scan_directory
+from app.services.business_report_service import BusinessProfile
 from app.services.storage_service import (
     list_scan_results,
     load_scan_result,
@@ -36,18 +37,23 @@ class ScanRequest(BaseModel):
     """Request body for local directory scanning."""
 
     directory_path: str
+    business_profile: BusinessProfile = "standard"
 
 
 class RepoScanRequest(BaseModel):
     """Request body for repository URL scanning."""
 
     repo_url: str
+    business_profile: BusinessProfile = "standard"
 
 
 @router.post("/local")
 def scan_local_directory(payload: ScanRequest):
     """Scan a local directory and save the result as JSON."""
-    scan_result = scan_directory(payload.directory_path)
+    scan_result = scan_directory(
+    payload.directory_path,
+    business_profile=payload.business_profile,
+)
 
     if "error" in scan_result:
         raise HTTPException(status_code=400, detail=scan_result["error"])
@@ -65,7 +71,10 @@ def scan_local_directory(payload: ScanRequest):
 
 
 @router.post("/upload")
-async def scan_uploaded_zip(file: UploadFile = File(...)):
+async def scan_uploaded_zip(
+    file: UploadFile = File(...),
+    business_profile: BusinessProfile = Form("standard"),
+):
     """Scan an uploaded ZIP file and save the result as JSON."""
     if not file.filename:
         raise HTTPException(status_code=400, detail="Missing file name")
@@ -102,7 +111,10 @@ async def scan_uploaded_zip(file: UploadFile = File(...)):
         extract_name = Path(file.filename).stem
         extracted_path = extract_zip_file(temp_zip_path, extract_name)
 
-        scan_result = scan_directory(extracted_path)
+        scan_result = scan_directory(
+        extracted_path,
+        business_profile=business_profile,
+        )
 
         if "error" in scan_result:
             raise HTTPException(status_code=400, detail=scan_result["error"])
@@ -138,7 +150,10 @@ def scan_github_repo(payload: RepoScanRequest):
         repo_name = download_github_repo_zip(payload.repo_url, temp_zip_path)
         extracted_path = extract_zip_file(temp_zip_path, repo_name)
 
-        scan_result = scan_directory(extracted_path)
+        scan_result = scan_directory(
+        extracted_path,
+        business_profile=payload.business_profile,
+        )
 
         if "error" in scan_result:
             raise HTTPException(status_code=400, detail=scan_result["error"])

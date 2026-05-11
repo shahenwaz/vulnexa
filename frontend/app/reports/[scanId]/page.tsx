@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 
-import { BackendUnavailableState } from "@/components/shared/backend-unavailable-state";
 import { ExecutiveSummary } from "@/components/reports/executive-summary";
 import { GroupedFindings } from "@/components/reports/grouped-findings";
-import { RemediationSummary } from "@/components/reports/remediation-summary";
+import { ManagementReport } from "@/components/reports/management-report";
 import { ReportHeader } from "@/components/reports/report-header";
 import { SeveritySummaryTable } from "@/components/reports/severity-summary-table";
+import { BackendUnavailableState } from "@/components/shared/backend-unavailable-state";
 import { Container } from "@/components/shared/container";
 import { Section } from "@/components/shared/section";
 import { mapBackendScanResultToUiScanResult } from "@/lib/api/backend-mappers";
@@ -49,15 +49,9 @@ export default async function ReportPage({ params }: ReportPageProps) {
       <Container className="max-w-6xl space-y-6 md:space-y-8 print:max-w-none print:px-0">
         <ReportHeader result={result} />
         <ExecutiveSummary result={result} />
-
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <GroupedFindings result={result} />
-
-          <div className="space-y-6 lg:sticky lg:top-24 print:static">
-            <SeveritySummaryTable result={result} />
-            <RemediationSummary result={result} />
-          </div>
-        </div>
+        <ManagementReport result={result} />
+        <SeveritySummaryTable result={result} />
+        <GroupedFindings result={result} />
       </Container>
     </Section>
   );
