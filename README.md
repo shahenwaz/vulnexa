@@ -7,7 +7,7 @@
 
 Vulnexa is an open-source smart vulnerability assessment and business risk reporting tool for web applications. It helps users scan codebases, review security findings, understand severity levels, and generate reports that explain both technical issues and business-level impact.
 
-This project was developed as a final-year university major project with a focus on practical security workflows, clean product design, understandable remediation guidance, and management-friendly reporting.
+This project was developed as a third-year university major project with a focus on practical security workflows, clean product design, understandable remediation guidance, and management-friendly reporting.
 
 ## Features
 
